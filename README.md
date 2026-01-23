@@ -2,6 +2,8 @@
 
 Minimal macOS menu bar app displaying battery time remaining.
 
+![On battery](screenshots/on-battery.png) ![Charging](screenshots/charging.png) ![Calculating](screenshots/calculating.png)
+
 ## Display
 
 | State | Display |
