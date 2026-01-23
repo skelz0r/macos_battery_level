@@ -24,7 +24,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func startTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [weak self] _ in
             self?.updateBatteryStatus()
         }
     }
@@ -36,9 +36,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if status.isFullyCharged {
             displayText = "⚡"
         } else if status.isCharging {
-            displayText = "⚡ \(status.timeString)"
+            displayText = "⚡\(status.timeString)"
         } else {
-            displayText = status.timeString
+            displayText = "🔋\(status.timeString)"
         }
 
         DispatchQueue.main.async {
