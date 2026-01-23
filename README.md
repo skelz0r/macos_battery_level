@@ -6,10 +6,17 @@ Minimal macOS menu bar app displaying battery time remaining.
 
 | State | Display |
 |-------|---------|
-| On battery | `3:45` |
-| Charging | `⚡ 1:20` |
+| On battery | `🔋3:45` |
+| Charging | `⚡1:20` |
 | Fully charged | `⚡` |
 | Calculating | `...` |
+
+## Menu
+
+- Battery percentage
+- Power source (Battery/Power Adapter)
+- Low Power Mode toggle (requires admin)
+- Battery Settings shortcut
 
 ## Build
 

@@ -4,6 +4,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
     private var timer: Timer?
     private let batteryMonitor = BatteryMonitor()
+    private var currentStatus: BatteryStatus?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -19,8 +20,52 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func setupMenu() {
         let menu = NSMenu()
-        menu.addItem(NSMenuItem(title: "Quit", action: #selector(quit), keyEquivalent: "q"))
         statusItem.menu = menu
+    }
+
+    private func updateMenu(_ status: BatteryStatus) {
+        guard let menu = statusItem.menu else { return }
+        menu.removeAllItems()
+
+        let batteryItem = NSMenuItem(title: "", action: nil, keyEquivalent: "")
+        batteryItem.isEnabled = false
+        let batteryView = NSView(frame: NSRect(x: 0, y: 0, width: 250, height: 28))
+        let titleLabel = NSTextField(labelWithString: "Battery")
+        titleLabel.frame = NSRect(x: 20, y: 4, width: 100, height: 20)
+        titleLabel.font = NSFont.systemFont(ofSize: 13, weight: .semibold)
+        let percentLabel = NSTextField(labelWithString: "\(status.percentage) %")
+        percentLabel.frame = NSRect(x: 180, y: 4, width: 55, height: 20)
+        percentLabel.font = NSFont.systemFont(ofSize: 13)
+        percentLabel.alignment = .right
+        batteryView.addSubview(titleLabel)
+        batteryView.addSubview(percentLabel)
+        batteryItem.view = batteryView
+
+        let sourceItem = NSMenuItem(title: "Power Source: \(status.powerSource)", action: nil, keyEquivalent: "")
+        sourceItem.isEnabled = false
+
+        let lowPowerItem = NSMenuItem(title: "Low Power Mode", action: #selector(toggleLowPower), keyEquivalent: "")
+        lowPowerItem.state = status.lowPowerMode ? .on : .off
+
+        menu.addItem(batteryItem)
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(sourceItem)
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(lowPowerItem)
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(NSMenuItem(title: "Battery Settings...", action: #selector(openBatterySettings), keyEquivalent: ""))
+        menu.addItem(NSMenuItem.separator())
+        menu.addItem(NSMenuItem(title: "Quit", action: #selector(quit), keyEquivalent: "q"))
+    }
+
+    @objc private func openBatterySettings() {
+        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.battery")!)
+    }
+
+    @objc private func toggleLowPower() {
+        guard let status = currentStatus else { return }
+        batteryMonitor.toggleLowPowerMode(enable: !status.lowPowerMode)
+        updateBatteryStatus()
     }
 
     private func startTimer() {
@@ -31,6 +76,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func updateBatteryStatus() {
         let status = batteryMonitor.getStatus()
+        currentStatus = status
 
         var displayText: String
         if status.isFullyCharged {
@@ -43,6 +89,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         DispatchQueue.main.async {
             self.statusItem.button?.title = displayText
+            self.updateMenu(status)
         }
     }
 
