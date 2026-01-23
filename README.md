@@ -14,8 +14,6 @@ Minimal macOS menu bar app displaying battery time remaining.
 ## Menu
 
 - Battery percentage
-- Power source (Battery/Power Adapter)
-- Low Power Mode toggle (requires admin)
 - Battery Settings shortcut
 
 ## Build
