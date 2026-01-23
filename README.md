@@ -16,18 +16,23 @@ Minimal macOS menu bar app displaying battery time remaining.
 - Battery percentage
 - Battery Settings shortcut
 
-## Build
+## Install
+
+```bash
+./install.sh
+```
+
+Builds, copies to `/Applications`, and starts at login.
+
+## Uninstall
+
+```bash
+./uninstall.sh
+```
+
+## Build only
 
 ```bash
 ./build.sh
-```
-
-## Run
-
-```bash
 open BatteryTime.app
 ```
-
-## Install
-
-Copy `BatteryTime.app` to `/Applications`.
