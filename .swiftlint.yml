@@ -1,0 +1,48 @@
+excluded:
+  - .build
+  - build
+  - BatteryTime.app
+  - worktrees
+
+disabled_rules:
+  - opening_brace
+  - trailing_comma
+  - vertical_parameter_alignment
+
+opt_in_rules:
+  - closure_end_indentation
+  - closure_spacing
+  - collection_alignment
+  - contains_over_filter_count
+  - contains_over_first_not_nil
+  - discouraged_optional_boolean
+  - empty_count
+  - empty_string
+  - explicit_init
+  - fatal_error_message
+  - final_test_case
+  - first_where
+  - force_unwrapping
+  - implicitly_unwrapped_optional
+  - last_where
+  - legacy_multiple
+  - modifier_order
+  - multiline_parameters
+  - operator_usage_whitespace
+  - prefer_self_in_static_references
+  - prefer_self_type_over_type_of_self
+  - private_action
+  - private_outlet
+  - redundant_nil_coalescing
+  - redundant_type_annotation
+  - sorted_imports
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+  - unowned_variable_capture
+  - untyped_error_in_catch
+  - weak_delegate
+  - yoda_condition
+
+line_length:
+  warning: 120
+  error: 120
