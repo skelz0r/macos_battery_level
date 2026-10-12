@@ -38,3 +38,13 @@ Builds, copies to `/Applications`, and starts at login.
 ./build.sh
 open BatteryTime.app
 ```
+
+## Lint
+
+```bash
+bin/lint
+```
+
+Runs `swift format` (shipped with the Swift toolchain) and `swiftlint`
+(`brew install swiftlint`) in strict mode. `bin/lint --fix` applies
+automatic corrections first.
