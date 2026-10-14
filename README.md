@@ -20,6 +20,8 @@ Requires macOS 26 (Liquid Glass).
 ## Panel
 
 - Battery percentage, charge bar and time remaining
+- Power drawn on battery (`Using 10.4 W`), or the charger's wattage and
+  port when plugged in (`67W USB-C charger`)
 - Processes using significant energy, with their app icon
 - Menu bar title setting: time remaining (default), percentage or both
 - Battery Settings shortcut
