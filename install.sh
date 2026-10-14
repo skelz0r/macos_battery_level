@@ -3,6 +3,8 @@ set -e
 
 ./build.sh
 
+pkill -x BatteryTime || true
+rm -rf /Applications/BatteryTime.app
 cp -r BatteryTime.app /Applications/
 
 mkdir -p ~/Library/LaunchAgents
@@ -24,6 +26,7 @@ cat > ~/Library/LaunchAgents/com.local.BatteryTime.plist << 'EOF'
 </plist>
 EOF
 
-launchctl load ~/Library/LaunchAgents/com.local.BatteryTime.plist 2>/dev/null || true
+launchctl unload ~/Library/LaunchAgents/com.local.BatteryTime.plist 2>/dev/null || true
+launchctl load ~/Library/LaunchAgents/com.local.BatteryTime.plist
 
 echo "Installed. BatteryTime will start at login."

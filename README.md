@@ -35,6 +35,15 @@ Impact column; clicking one opens Activity Monitor.
 
 Builds, copies to `/Applications`, and starts at login.
 
+## Update
+
+```bash
+git pull
+./install.sh
+```
+
+Replaces the installed app and restarts it.
+
 ## Uninstall
 
 ```bash
