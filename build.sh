@@ -2,22 +2,16 @@
 set -e
 
 APP_NAME="BatteryTime"
-BUILD_DIR="build"
 
-rm -rf "$BUILD_DIR" "$APP_NAME.app"
+rm -rf "$APP_NAME.app"
 
-mkdir -p "$BUILD_DIR"
+swift build -c release --product "$APP_NAME"
+BIN_DIR="$(swift build -c release --show-bin-path)"
+
 mkdir -p "$APP_NAME.app/Contents/MacOS"
 mkdir -p "$APP_NAME.app/Contents/Resources"
 
 cp Info.plist "$APP_NAME.app/Contents/"
-
-swiftc -o "$APP_NAME.app/Contents/MacOS/$APP_NAME" \
-    -framework Cocoa \
-    -swift-version 6 \
-    -warnings-as-errors \
-    main.swift \
-    AppDelegate.swift \
-    BatteryMonitor.swift
+cp "$BIN_DIR/$APP_NAME" "$APP_NAME.app/Contents/MacOS/$APP_NAME"
 
 echo "Built $APP_NAME.app"
