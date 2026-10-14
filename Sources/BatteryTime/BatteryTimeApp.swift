@@ -28,18 +28,15 @@ final class BatteryPanelModel {
     private(set) var batteryStatus: BatteryStatus
     private(set) var powerFlow: PowerFlow?
     private(set) var energyUse = EnergyUse.notMeasured
-    private let batteryMonitor = BatteryMonitor()
-    private var timer: Timer?
+    @ObservationIgnored private var batteryMonitor: BatteryMonitor?
     private var energyMeasurement: Task<Void, Never>?
 
     init() {
-        batteryStatus = batteryMonitor.getStatus()
-        powerFlow = PowerMonitor.currentFlow()
-        timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [weak self] _ in
-            MainActor.assumeIsolated {
-                self?.updateBatteryStatus()
-            }
+        batteryStatus = BatteryStatus(state: .unknown, percentage: 0)
+        batteryMonitor = BatteryMonitor { [weak self] in
+            self?.updateBatteryStatus()
         }
+        updateBatteryStatus()
     }
 
     func panelDidOpen() {
@@ -60,7 +57,7 @@ final class BatteryPanelModel {
     }
 
     private func updateBatteryStatus() {
-        batteryStatus = batteryMonitor.getStatus()
+        batteryStatus = BatteryMonitor.currentStatus()
         powerFlow = PowerMonitor.currentFlow()
     }
 }
