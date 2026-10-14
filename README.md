@@ -2,6 +2,8 @@
 
 Minimal macOS menu bar app displaying battery time remaining.
 
+Requires macOS 26 (Liquid Glass).
+
 ![On battery](screenshots/on-battery.png) ![Charging](screenshots/charging.png) ![Calculating](screenshots/calculating.png)
 
 ## Display
@@ -15,14 +17,15 @@ Minimal macOS menu bar app displaying battery time remaining.
 | Calculating | `🔋...` or `⚡...` |
 | No battery | `No battery` |
 
-## Menu
+## Panel
 
-- Battery percentage
-- Processes using significant energy, if any
+- Battery percentage, charge bar and time remaining
+- Processes using significant energy, with their app icon
 - Battery Settings shortcut
+- Quit (⌘Q)
 
-Energy use is measured with `top` when the menu opens, never in the
-background: it takes a few seconds and the menu shows "Measuring energy
+Energy use is measured with `top` when the panel opens, never in the
+background: it takes a few seconds and the panel shows "Measuring energy
 use..." meanwhile. Up to five apps or processes with an energy impact
 of 20 or more are listed, the same figure as Activity Monitor's Energy
 Impact column; clicking one opens Activity Monitor.
