@@ -28,9 +28,24 @@ struct EnergyHogsTests {
         #expect(abs(node.impact - 101.8) < 0.01)
     }
 
-    private func hogs(forFixture name: String) throws -> [EnergyHog] {
+    @Test("Only a process running from an app bundle can be traced back to an app to quit")
+    func appBundleOfProcess() throws {
+        let codeHelper =
+            "/Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper.app/Contents/MacOS/Code Helper"
+        let executablePaths: [Int32: String] = [93569: codeHelper, 93491: codeHelper, 93545: "/usr/bin/yes"]
+        let hogs = try hogs(forFixture: "top_power_with_load") { executablePaths[$0] }
+        let vsCode = try #require(hogs.first { $0.name == "Visual Studio Code" })
+        let yes = try #require(hogs.first { $0.name == "yes" })
+        #expect(vsCode.appBundlePath == "/Applications/Visual Studio Code.app")
+        #expect(yes.appBundlePath == nil)
+    }
+
+    private func hogs(
+        forFixture name: String,
+        executablePath: (Int32) -> String? = { _ in nil }
+    ) throws -> [EnergyHog] {
         let url = try #require(Bundle.module.url(forResource: name, withExtension: "txt", subdirectory: "Fixtures"))
         let output = try String(contentsOf: url, encoding: .utf8)
-        return EnergyMonitor.hogs(fromTopOutput: output)
+        return EnergyMonitor.hogs(fromTopOutput: output, executablePath: executablePath)
     }
 }

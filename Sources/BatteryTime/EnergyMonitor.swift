@@ -3,6 +3,7 @@ import Foundation
 struct EnergyHog: Equatable {
     let name: String
     let impact: Double
+    var appBundlePath: String?
 }
 
 enum EnergyMonitor {
@@ -19,15 +20,22 @@ enum EnergyMonitor {
         fromTopOutput output: String,
         executablePath: (Int32) -> String? = { _ in nil }
     ) -> [EnergyHog] {
-        let impactByName = Dictionary(
+        let hogsByName = Dictionary(
             lastSample(of: output).map { sample in
-                (executablePath(sample.pid).map(appName(forExecutablePath:)) ?? sample.name, sample.impact)
+                let path = executablePath(sample.pid)
+                let name = path.map(appName(forExecutablePath:)) ?? sample.name
+                return (name, EnergyHog(name: name, impact: sample.impact, appBundlePath: path.flatMap(appBundlePath)))
             },
-            uniquingKeysWith: +
+            uniquingKeysWith: { first, second in
+                EnergyHog(
+                    name: first.name,
+                    impact: first.impact + second.impact,
+                    appBundlePath: first.appBundlePath == second.appBundlePath ? first.appBundlePath : nil
+                )
+            }
         )
         let hogs =
-            impactByName
-            .map { EnergyHog(name: $0.key, impact: $0.value) }
+            hogsByName.values
             .filter { $0.impact >= impactThreshold }
             .sorted { $0.impact > $1.impact }
         return Array(hogs.prefix(maximumCount))
@@ -39,6 +47,10 @@ enum EnergyMonitor {
             return String(appBundle.dropLast(".app".count))
         }
         return components.last.map(String.init) ?? path
+    }
+
+    private static func appBundlePath(forExecutablePath path: String) -> String? {
+        path.range(of: ".app/").map { String(path[..<$0.lowerBound]) + ".app" }
     }
 
     private static func lastSample(of output: String) -> [ProcessSample] {
