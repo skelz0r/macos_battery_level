@@ -31,7 +31,10 @@ Energy use is measured with `top` when the panel opens, never in the
 background: it takes a few seconds and the panel shows "Measuring energy
 use..." meanwhile. Up to five apps or processes with an energy impact
 of 20 or more are listed, the same figure as Activity Monitor's Energy
-Impact column; clicking one opens Activity Monitor.
+Impact column; clicking one opens Activity Monitor. Holding Option
+turns the impact of each app into "Quit": an Option-click asks the app
+to quit, as ⌘Q would. Processes that are not apps keep opening Activity
+Monitor.
 
 ## Install
 

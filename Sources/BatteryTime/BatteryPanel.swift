@@ -174,6 +174,7 @@ private struct ChargeBar: View {
 
 private struct EnergySection: View {
     let energyUse: BatteryPanelModel.EnergyUse
+    @State private var isOptionPressed = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -201,26 +202,40 @@ private struct EnergySection: View {
                 }
             case .measured(let hogs):
                 ForEach(hogs, id: \.name) { hog in
-                    PanelRow(action: openActivityMonitor) {
-                        Image(nsImage: appIcon(named: hog.name))
+                    let app = runningApplication(atPath: hog.appBundlePath)
+                    PanelRow {
+                        if let app, NSApp.currentEvent?.modifierFlags.contains(.option) == true {
+                            closePanel()
+                            app.terminate()
+                        } else {
+                            openActivityMonitor()
+                        }
+                    } content: {
+                        Image(nsImage: app?.icon ?? NSWorkspace.shared.icon(for: .unixExecutable))
                             .resizable()
                             .frame(width: 18, height: 18)
                         Text(hog.name)
                             .lineLimit(1)
                         Spacer()
-                        Text("\(Int(hog.impact.rounded()))")
+                        Text(isOptionPressed && app != nil ? "Quit" : "\(Int(hog.impact.rounded()))")
                             .monospacedDigit()
                             .foregroundStyle(.secondary)
                     }
-                    .help("Open Activity Monitor")
+                    .help(app == nil ? "Open Activity Monitor" : "Open Activity Monitor, Option-click to quit")
+                }
+                .onAppear {
+                    isOptionPressed = NSEvent.modifierFlags.contains(.option)
                 }
             }
         }
+        .onModifierKeysChanged(mask: .option) { _, keys in
+            isOptionPressed = keys.contains(.option)
+        }
     }
 
-    private func appIcon(named name: String) -> NSImage {
-        NSWorkspace.shared.runningApplications.first { $0.localizedName == name }?.icon
-            ?? NSWorkspace.shared.icon(for: .unixExecutable)
+    private func runningApplication(atPath appBundlePath: String?) -> NSRunningApplication? {
+        guard let appBundlePath else { return nil }
+        return NSWorkspace.shared.runningApplications.first { $0.bundleURL?.path == appBundlePath }
     }
 }
 
