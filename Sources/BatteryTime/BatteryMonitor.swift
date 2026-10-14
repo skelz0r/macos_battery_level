@@ -17,7 +17,7 @@ struct BatteryStatus {
     func menuBarTitle(showing display: TitleDisplay) -> String {
         switch state {
         case .discharging(let remaining):
-            "🔋\(details(remaining: remaining, showing: display))"
+            details(remaining: remaining, showing: display)
         case .charging(let remaining):
             "⚡\(details(remaining: remaining, showing: display))"
         case .pluggedInNotCharging, .charged:
@@ -37,6 +37,17 @@ struct BatteryStatus {
             "\(percentage)%"
         case .both:
             "\(remaining) \(percentage)%"
+        }
+    }
+
+    var menuBarBatterySymbol: String? {
+        guard case .discharging = state else { return nil }
+        return switch percentage {
+        case ...12: "battery.0percent"
+        case ...37: "battery.25percent"
+        case ...62: "battery.50percent"
+        case ...87: "battery.75percent"
+        default: "battery.100percent"
         }
     }
 }

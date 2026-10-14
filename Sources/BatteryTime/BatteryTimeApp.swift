@@ -10,7 +10,7 @@ struct BatteryTimeApp: App {
         MenuBarExtra {
             BatteryPanel(model: model)
         } label: {
-            Text(model.batteryStatus.menuBarTitle(showing: titleDisplay))
+            MenuBarLabel(status: model.batteryStatus, display: titleDisplay)
         }
         .menuBarExtraStyle(.window)
     }

@@ -4,14 +4,14 @@ import Testing
 @testable import BatteryTime
 
 struct MenuBarTitleTests {
-    @Test("On battery shows a battery and the time remaining")
+    @Test("On battery shows the time remaining")
     func onBattery() {
-        #expect(title(of: battery(on: kIOPSBatteryPowerValue, [kIOPSTimeToEmptyKey: 312])) == "🔋5:12")
+        #expect(title(of: battery(on: kIOPSBatteryPowerValue, [kIOPSTimeToEmptyKey: 312])) == "5:12")
     }
 
-    @Test("On battery while macOS is still estimating shows a battery and dots")
+    @Test("On battery while macOS is still estimating shows dots")
     func onBatteryWithoutEstimate() {
-        #expect(title(of: battery(on: kIOPSBatteryPowerValue, [kIOPSTimeToEmptyKey: -1])) == "🔋...")
+        #expect(title(of: battery(on: kIOPSBatteryPowerValue, [kIOPSTimeToEmptyKey: -1])) == "...")
     }
 
     @Test("Charging shows a bolt and the time until full")
