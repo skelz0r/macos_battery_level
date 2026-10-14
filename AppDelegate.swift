@@ -69,10 +69,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 "🔋\(status.timeString)"
             }
 
-        DispatchQueue.main.async {
-            self.statusItem.button?.title = displayText
-            self.updateMenu(status)
-        }
+        statusItem.button?.title = displayText
+        updateMenu(status)
     }
 
     @objc private func quit() {
