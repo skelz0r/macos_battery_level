@@ -6,12 +6,23 @@ struct EnergyHog: Equatable {
 }
 
 enum EnergyMonitor {
+    private struct ProcessSample {
+        let pid: Int32
+        let name: String
+        let impact: Double
+    }
+
     static let impactThreshold = 20.0
     static let maximumCount = 5
 
-    static func hogs(fromTopOutput output: String) -> [EnergyHog] {
+    static func hogs(
+        fromTopOutput output: String,
+        executablePath: (Int32) -> String? = { _ in nil }
+    ) -> [EnergyHog] {
         let impactByName = Dictionary(
-            lastSample(of: output).map { ($0.name, $0.impact) },
+            lastSample(of: output).map { sample in
+                (executablePath(sample.pid).map(appName(forExecutablePath:)) ?? sample.name, sample.impact)
+            },
             uniquingKeysWith: +
         )
         let hogs =
@@ -22,16 +33,24 @@ enum EnergyMonitor {
         return Array(hogs.prefix(maximumCount))
     }
 
-    private static func lastSample(of output: String) -> [EnergyHog] {
+    private static func appName(forExecutablePath path: String) -> String {
+        let components = path.split(separator: "/")
+        if let appBundle = components.first(where: { $0.hasSuffix(".app") }) {
+            return String(appBundle.dropLast(".app".count))
+        }
+        return components.last.map(String.init) ?? path
+    }
+
+    private static func lastSample(of output: String) -> [ProcessSample] {
         let lines = output.split(separator: "\n")
         guard let headerIndex = lines.lastIndex(where: { $0.hasPrefix("PID") }) else { return [] }
 
         return lines[(headerIndex + 1)...].compactMap { line in
             let columns = line.split(whereSeparator: \.isWhitespace)
-            guard columns.count >= 3, Int32(columns[0]) != nil, let impact = columns.last.flatMap({ Double($0) })
+            guard columns.count >= 3, let pid = Int32(columns[0]), let impact = columns.last.flatMap({ Double($0) })
             else { return nil }
             let name = columns.dropFirst().dropLast().joined(separator: " ")
-            return EnergyHog(name: name, impact: impact)
+            return ProcessSample(pid: pid, name: name, impact: impact)
         }
     }
 }
@@ -50,12 +69,22 @@ final class EnergyMeasurement: @unchecked Sendable {
         await withTaskCancellationHandler {
             await withCheckedContinuation { continuation in
                 DispatchQueue.global(qos: .utility).async {
-                    continuation.resume(returning: self.runTop().map(EnergyMonitor.hogs(fromTopOutput:)))
+                    let hogs = self.runTop().map {
+                        EnergyMonitor.hogs(fromTopOutput: $0, executablePath: Self.executablePath(of:))
+                    }
+                    continuation.resume(returning: hogs)
                 }
             }
         } onCancel: {
             cancel()
         }
+    }
+
+    private static func executablePath(of pid: Int32) -> String? {
+        var buffer = [UInt8](repeating: 0, count: Int(MAXPATHLEN) * 4)
+        let length = proc_pidpath(pid, &buffer, UInt32(buffer.count))
+        guard length > 0 else { return nil }
+        return String(bytes: buffer.prefix(Int(length)), encoding: .utf8)
     }
 
     private func runTop() -> String? {
