@@ -1,13 +1,11 @@
 import Cocoa
 
-class AppDelegate: NSObject, NSApplicationDelegate {
-    private var statusItem: NSStatusItem!
+final class AppDelegate: NSObject, NSApplicationDelegate {
+    private lazy var statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private var timer: Timer?
     private let batteryMonitor = BatteryMonitor()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
-
         if let button = statusItem.button {
             button.title = "..."
         }
@@ -42,15 +40,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
         menu.addItem(batteryItem)
         menu.addItem(NSMenuItem.separator())
-        menu.addItem(NSMenuItem(title: "Battery Settings...", action: #selector(openBatterySettings), keyEquivalent: ""))
+        menu.addItem(
+            NSMenuItem(title: "Battery Settings...", action: #selector(openBatterySettings), keyEquivalent: ""))
         menu.addItem(NSMenuItem.separator())
         menu.addItem(NSMenuItem(title: "Quit", action: #selector(quit), keyEquivalent: "q"))
     }
 
     @objc private func openBatterySettings() {
-        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.battery")!)
+        guard let url = URL(string: "x-apple.systempreferences:com.apple.preference.battery") else { return }
+        NSWorkspace.shared.open(url)
     }
-
 
     private func startTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [weak self] _ in
@@ -61,14 +60,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private func updateBatteryStatus() {
         let status = batteryMonitor.getStatus()
 
-        var displayText: String
-        if status.isFullyCharged {
-            displayText = "⚡"
-        } else if status.isCharging {
-            displayText = "⚡\(status.timeString)"
-        } else {
-            displayText = "🔋\(status.timeString)"
-        }
+        let displayText =
+            if status.isFullyCharged {
+                "⚡"
+            } else if status.isCharging {
+                "⚡\(status.timeString)"
+            } else {
+                "🔋\(status.timeString)"
+            }
 
         DispatchQueue.main.async {
             self.statusItem.button?.title = displayText

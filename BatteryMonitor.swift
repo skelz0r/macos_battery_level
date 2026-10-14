@@ -7,12 +7,11 @@ struct BatteryStatus {
     let percentage: Int
 }
 
-class BatteryMonitor {
+final class BatteryMonitor {
     func getStatus() -> BatteryStatus {
         let output = runPmset()
         return parse(output)
     }
-
 
     private func runPmset() -> String {
         let process = Process()
@@ -40,8 +39,9 @@ class BatteryMonitor {
         var percentage = 0
         let percentPattern = #"(\d+)%"#
         if let regex = try? NSRegularExpression(pattern: percentPattern),
-           let match = regex.firstMatch(in: output, range: NSRange(output.startIndex..., in: output)),
-           let range = Range(match.range(at: 1), in: output) {
+            let match = regex.firstMatch(in: output, range: NSRange(output.startIndex..., in: output)),
+            let range = Range(match.range(at: 1), in: output)
+        {
             percentage = Int(output[range]) ?? 0
         }
 
@@ -51,13 +51,17 @@ class BatteryMonitor {
 
         let pattern = #"(\d+:\d+) (remaining|until full)"#
         if let regex = try? NSRegularExpression(pattern: pattern),
-           let match = regex.firstMatch(in: output, range: NSRange(output.startIndex..., in: output)),
-           let range = Range(match.range(at: 1), in: output) {
-            return BatteryStatus(timeString: String(output[range]), isCharging: isCharging, isFullyCharged: false, percentage: percentage)
+            let match = regex.firstMatch(in: output, range: NSRange(output.startIndex..., in: output)),
+            let range = Range(match.range(at: 1), in: output)
+        {
+            return BatteryStatus(
+                timeString: String(output[range]), isCharging: isCharging, isFullyCharged: false, percentage: percentage
+            )
         }
 
         if output.contains("(no estimate)") || output.contains("calculating") {
-            return BatteryStatus(timeString: "...", isCharging: isCharging, isFullyCharged: false, percentage: percentage)
+            return BatteryStatus(
+                timeString: "...", isCharging: isCharging, isFullyCharged: false, percentage: percentage)
         }
 
         if !output.contains("InternalBattery") {
