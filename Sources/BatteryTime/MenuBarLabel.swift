@@ -1,0 +1,23 @@
+import AppKit
+import SwiftUI
+
+struct MenuBarLabel: View {
+    let status: BatteryStatus
+    let display: TitleDisplay
+
+    var body: some View {
+        if let symbol = status.menuBarBatterySymbol {
+            Image(nsImage: render(Text("\(Image(systemName: symbol)) \(status.menuBarTitle(showing: display))")))
+        } else {
+            Text(status.menuBarTitle(showing: display))
+        }
+    }
+
+    private func render(_ title: Text) -> NSImage {
+        let renderer = ImageRenderer(content: title.font(.system(size: NSFont.systemFontSize)))
+        renderer.scale = NSScreen.screens.map(\.backingScaleFactor).max() ?? 2
+        let image = renderer.nsImage ?? NSImage()
+        image.isTemplate = true
+        return image
+    }
+}

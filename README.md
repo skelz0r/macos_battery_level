@@ -10,12 +10,14 @@ Requires macOS 26 (Liquid Glass).
 
 | State | Time | % | Both |
 |-------|------|---|------|
-| On battery | `🔋3:45` | `🔋85%` | `🔋3:45 85%` |
+| On battery | battery icon then `3:45` | battery icon then `85%` | battery icon then `3:45 85%` |
 | Charging | `⚡1:20` | `⚡60%` | `⚡1:20 60%` |
 | Fully charged | `⚡` | `⚡100%` | `⚡100%` |
 | Plugged in, not charging | `⚡` | `⚡80%` | `⚡80%` |
-| Calculating | `🔋...` or `⚡...` | `🔋85%` or `⚡60%` | `🔋... 85%` or `⚡... 60%` |
+| Calculating | battery icon then `...`, or `⚡...` | battery icon then `85%`, or `⚡60%` | battery icon then `... 85%`, or `⚡... 60%` |
 | No battery | `No battery` | `No battery` | `No battery` |
+
+On battery, the battery icon shows the charge level.
 
 ## Panel
 
