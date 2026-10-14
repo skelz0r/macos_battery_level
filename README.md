@@ -28,6 +28,7 @@ less, the same thresholds as the charge bar of the panel.
 - Power drawn on battery (`Using 10.4 W`), or the charger's wattage and
   port when plugged in (`67W USB-C charger`)
 - Charge level over the last 24 hours, plugged-in periods shaded green
+- Battery health: cycle count, maximum capacity and condition
 - Processes using significant energy, with their app icon
 - Menu bar title setting: time remaining (default), percentage or both
 - Battery Settings shortcut
@@ -45,6 +46,11 @@ Monitor.
 The charge history is sampled while the app runs, every five minutes or
 on any change, and kept across restarts. The curve is cut wherever the
 app was not running or the Mac was asleep for a while.
+
+Maximum capacity is the full charge capacity against the design
+capacity, as in System Settings. The condition turns to "Service" when
+the battery reports a permanent failure or falls under 80 %, the
+threshold Apple uses for its service recommendation.
 
 ## Notifications
 
