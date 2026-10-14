@@ -4,13 +4,12 @@ import SwiftUI
 @main
 struct BatteryTimeApp: App {
     @State private var model = BatteryPanelModel()
-    @AppStorage(TitleDisplay.defaultsKey) private var titleDisplay = TitleDisplay.time
 
     var body: some Scene {
         MenuBarExtra {
             BatteryPanel(model: model)
         } label: {
-            MenuBarLabel(status: model.batteryStatus, display: titleDisplay)
+            MenuBarLabel(status: model.batteryStatus)
         }
         .menuBarExtraStyle(.window)
     }

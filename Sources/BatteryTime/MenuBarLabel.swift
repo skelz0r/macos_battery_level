@@ -3,13 +3,12 @@ import SwiftUI
 
 struct MenuBarLabel: View {
     let status: BatteryStatus
-    let display: TitleDisplay
 
     var body: some View {
         if let symbol = status.menuBarBatterySymbol {
-            Image(nsImage: render(Text("\(Image(systemName: symbol)) \(status.menuBarTitle(showing: display))")))
+            Image(nsImage: render(Text("\(Image(systemName: symbol)) \(status.menuBarTitle)")))
         } else {
-            Text(status.menuBarTitle(showing: display))
+            Text(status.menuBarTitle)
         }
     }
 

@@ -14,29 +14,18 @@ struct BatteryStatus {
     let state: State
     let percentage: Int
 
-    func menuBarTitle(showing display: TitleDisplay) -> String {
+    var menuBarTitle: String {
         switch state {
         case .discharging(let remaining):
-            details(remaining: remaining, showing: display)
+            remaining
         case .charging(let remaining):
-            "⚡\(details(remaining: remaining, showing: display))"
+            "⚡\(remaining)"
         case .pluggedInNotCharging, .charged:
-            display == .time ? "⚡" : "⚡\(percentage)%"
+            "⚡"
         case .noBattery:
             "No battery"
         case .unknown:
             "—"
-        }
-    }
-
-    private func details(remaining: String, showing display: TitleDisplay) -> String {
-        switch display {
-        case .time:
-            remaining
-        case .percentage:
-            "\(percentage)%"
-        case .both:
-            "\(remaining) \(percentage)%"
         }
     }
 
@@ -50,12 +39,6 @@ struct BatteryStatus {
         default: "battery.100percent"
         }
     }
-}
-
-enum TitleDisplay: String {
-    case time
-    case percentage
-    case both
 }
 
 @MainActor

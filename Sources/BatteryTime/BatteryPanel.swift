@@ -15,7 +15,6 @@ struct BatteryPanel: View {
             }
             EnergySection(energyUse: model.energyUse)
             PanelDivider()
-            TitleDisplayPicker()
             PanelRow(action: openBatterySettings) {
                 Text("Battery Settings...")
             }
