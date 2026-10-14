@@ -14,10 +14,22 @@ struct MenuBarLabel: View {
     }
 
     private func render(_ title: Text) -> NSImage {
-        let renderer = ImageRenderer(content: title.font(.system(size: NSFont.systemFontSize)))
+        let renderer = ImageRenderer(
+            content:
+                title
+                .font(.system(size: NSFont.systemFontSize))
+                .foregroundStyle(status.menuBarColor ?? .black)
+        )
         renderer.scale = NSScreen.screens.map(\.backingScaleFactor).max() ?? 2
         let image = renderer.nsImage ?? NSImage()
-        image.isTemplate = true
+        image.isTemplate = status.menuBarColor == nil
         return image
+    }
+}
+
+extension BatteryStatus {
+    var menuBarColor: Color? {
+        guard case .discharging = state else { return nil }
+        return lowLevelColor
     }
 }

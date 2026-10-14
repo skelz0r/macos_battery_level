@@ -317,14 +317,16 @@ extension BatteryStatus {
         switch state {
         case .charging, .charged, .pluggedInNotCharging:
             .green
-        case _ where percentage <= 10:
-            .red
-        case _ where percentage <= 20:
-            .orange
-        case _ where ProcessInfo.processInfo.isLowPowerModeEnabled:
-            .yellow
         default:
-            .green
+            lowLevelColor ?? (ProcessInfo.processInfo.isLowPowerModeEnabled ? .yellow : .green)
+        }
+    }
+
+    var lowLevelColor: Color? {
+        switch percentage {
+        case ...10: .red
+        case ...20: .orange
+        default: nil
         }
     }
 }

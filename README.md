@@ -4,7 +4,7 @@ Minimal macOS menu bar app displaying battery time remaining.
 
 Requires macOS 26 (Liquid Glass).
 
-![On battery](screenshots/on-battery.png) ![Charging](screenshots/charging.png) ![Calculating](screenshots/calculating.png)
+![On battery](screenshots/on-battery.png) ![Low battery](screenshots/low-battery.png) ![Charging](screenshots/charging.png) ![Calculating](screenshots/calculating.png)
 
 ## Display
 
@@ -18,6 +18,9 @@ Requires macOS 26 (Liquid Glass).
 | No battery | `No battery` | `No battery` | `No battery` |
 
 On battery, the battery icon shows the charge level.
+
+On battery, the title turns orange at 20 % or less and red at 10 % or
+less, the same thresholds as the charge bar of the panel.
 
 ## Panel
 
