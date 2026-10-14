@@ -8,14 +8,14 @@ Requires macOS 26 (Liquid Glass).
 
 ## Display
 
-| State | Time | % | Both |
-|-------|------|---|------|
-| On battery | battery icon then `3:45` | battery icon then `85%` | battery icon then `3:45 85%` |
-| Charging | `⚡1:20` | `⚡60%` | `⚡1:20 60%` |
-| Fully charged | `⚡` | `⚡100%` | `⚡100%` |
-| Plugged in, not charging | `⚡` | `⚡80%` | `⚡80%` |
-| Calculating | battery icon then `...`, or `⚡...` | battery icon then `85%`, or `⚡60%` | battery icon then `... 85%`, or `⚡... 60%` |
-| No battery | `No battery` | `No battery` | `No battery` |
+| State | Display |
+|-------|---------|
+| On battery | battery icon then `3:45` |
+| Charging | `⚡1:20` |
+| Fully charged | `⚡` |
+| Plugged in, not charging | `⚡` |
+| Calculating | battery icon then `...`, or `⚡...` |
+| No battery | `No battery` |
 
 On battery, the battery icon shows the charge level.
 
@@ -30,7 +30,6 @@ less, the same thresholds as the charge bar of the panel.
 - Charge level over the last 24 hours, plugged-in periods shaded green
 - Battery health: cycle count, maximum capacity and condition
 - Processes using significant energy, with their app icon
-- Menu bar title setting: time remaining (default), percentage or both
 - Battery Settings shortcut
 - Quit (⌘Q)
 

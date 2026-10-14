@@ -39,7 +39,7 @@ struct MenuBarTitleTests {
 
     @Test("A Mac without battery says so, without battery icon")
     func desktopWithoutBattery() {
-        #expect(BatteryMonitor.status(fromPowerSources: []).menuBarTitle(showing: .time) == "No battery")
+        #expect(BatteryMonitor.status(fromPowerSources: []).menuBarTitle == "No battery")
     }
 
     private func battery(on powerSource: String, _ details: [String: Any]) -> [String: Any] {
@@ -52,6 +52,6 @@ struct MenuBarTitleTests {
     }
 
     private func title(of battery: [String: Any]) -> String {
-        BatteryMonitor.status(fromPowerSources: [battery]).menuBarTitle(showing: .time)
+        BatteryMonitor.status(fromPowerSources: [battery]).menuBarTitle
     }
 }
