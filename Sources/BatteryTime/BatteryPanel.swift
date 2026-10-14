@@ -8,6 +8,9 @@ struct BatteryPanel: View {
         VStack(alignment: .leading, spacing: 0) {
             if model.batteryStatus.hasBattery {
                 BatteryHeader(status: model.batteryStatus, powerFlow: model.powerFlow)
+                ChargeHistoryChart(history: model.chargeHistory)
+                    .padding(.horizontal, 14)
+                    .padding(.bottom, 8)
                 PanelDivider()
             }
             EnergySection(energyUse: model.energyUse)

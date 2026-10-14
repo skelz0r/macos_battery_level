@@ -22,6 +22,7 @@ Requires macOS 26 (Liquid Glass).
 - Battery percentage, charge bar and time remaining
 - Power drawn on battery (`Using 10.4 W`), or the charger's wattage and
   port when plugged in (`67W USB-C charger`)
+- Charge level over the last 24 hours, plugged-in periods shaded green
 - Processes using significant energy, with their app icon
 - Menu bar title setting: time remaining (default), percentage or both
 - Battery Settings shortcut
@@ -35,6 +36,10 @@ Impact column; clicking one opens Activity Monitor. Holding Option
 turns the impact of each app into "Quit": an Option-click asks the app
 to quit, as ⌘Q would. Processes that are not apps keep opening Activity
 Monitor.
+
+The charge history is sampled while the app runs, every five minutes or
+on any change, and kept across restarts. The curve is cut wherever the
+app was not running or the Mac was asleep for a while.
 
 ## Install
 
