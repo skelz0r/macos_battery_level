@@ -39,6 +39,12 @@ Builds, copies to `/Applications`, and starts at login.
 open BatteryTime.app
 ```
 
+## Test
+
+```bash
+swift test
+```
+
 ## Lint
 
 ```bash

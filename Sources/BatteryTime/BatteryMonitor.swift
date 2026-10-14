@@ -5,12 +5,21 @@ struct BatteryStatus {
     let isCharging: Bool
     let isFullyCharged: Bool
     let percentage: Int
+
+    var menuBarTitle: String {
+        if isFullyCharged {
+            return "⚡"
+        }
+        if isCharging {
+            return "⚡\(timeString)"
+        }
+        return "🔋\(timeString)"
+    }
 }
 
 final class BatteryMonitor {
     func getStatus() -> BatteryStatus {
-        let output = runPmset()
-        return parse(output)
+        Self.parse(runPmset())
     }
 
     private func runPmset() -> String {
@@ -32,7 +41,7 @@ final class BatteryMonitor {
         return String(data: data, encoding: .utf8) ?? ""
     }
 
-    private func parse(_ output: String) -> BatteryStatus {
+    static func parse(_ output: String) -> BatteryStatus {
         let isCharging = output.contains("AC Power") || (output.contains("charging") && !output.contains("discharging"))
         let isFullyCharged = output.contains("charged") && !output.contains("discharging")
 

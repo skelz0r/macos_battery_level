@@ -63,16 +63,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func updateBatteryStatus() {
         let status = batteryMonitor.getStatus()
 
-        let displayText =
-            if status.isFullyCharged {
-                "⚡"
-            } else if status.isCharging {
-                "⚡\(status.timeString)"
-            } else {
-                "🔋\(status.timeString)"
-            }
-
-        statusItem.button?.title = displayText
+        statusItem.button?.title = status.menuBarTitle
         updateMenu(status)
     }
 

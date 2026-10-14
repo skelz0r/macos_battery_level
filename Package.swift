@@ -9,6 +9,12 @@ let package = Package(
         .executableTarget(
             name: "BatteryTime",
             swiftSettings: [.unsafeFlags(["-warnings-as-errors"])]
-        )
+        ),
+        .testTarget(
+            name: "BatteryTimeTests",
+            dependencies: ["BatteryTime"],
+            resources: [.copy("Fixtures")],
+            swiftSettings: [.unsafeFlags(["-warnings-as-errors"])]
+        ),
     ]
 )
