@@ -1,4 +1,5 @@
 import Foundation
+import IOKit.ps
 
 struct BatteryStatus {
     enum State {
@@ -46,71 +47,78 @@ enum TitleDisplay: String {
     case both
 }
 
+@MainActor
 final class BatteryMonitor {
-    func getStatus() -> BatteryStatus {
-        Self.parse(runPmset())
+    private let onChange: () -> Void
+    private var runLoopSource: CFRunLoopSource?
+
+    init(onChange: @escaping () -> Void) {
+        self.onChange = onChange
+        let context = Unmanaged.passUnretained(self).toOpaque()
+        let notification = IOPSNotificationCreateRunLoopSource(
+            { context in
+                guard let context else { return }
+                let monitor = Unmanaged<BatteryMonitor>.fromOpaque(context).takeUnretainedValue()
+                MainActor.assumeIsolated {
+                    monitor.onChange()
+                }
+            }, context)
+        guard let source = notification?.takeRetainedValue() else { return }
+        runLoopSource = source
+        CFRunLoopAddSource(CFRunLoopGetMain(), source, .defaultMode)
     }
 
-    private func runPmset() -> String {
-        let process = Process()
-        let pipe = Pipe()
-
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/pmset")
-        process.arguments = ["-g", "batt"]
-        process.standardOutput = pipe
-
-        do {
-            try process.run()
-            process.waitUntilExit()
-        } catch {
-            return ""
+    isolated deinit {
+        if let runLoopSource {
+            CFRunLoopSourceInvalidate(runLoopSource)
         }
-
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        return String(data: data, encoding: .utf8) ?? ""
     }
 
-    static func parse(_ output: String) -> BatteryStatus {
-        guard let batteryLine = output.split(separator: "\n").first(where: { $0.contains("InternalBattery") }) else {
+    nonisolated static func currentStatus() -> BatteryStatus {
+        guard let snapshot = IOPSCopyPowerSourcesInfo()?.takeRetainedValue(),
+            let sources = IOPSCopyPowerSourcesList(snapshot)?.takeRetainedValue() as? [CFTypeRef]
+        else {
+            return BatteryStatus(state: .unknown, percentage: 0)
+        }
+        let descriptions = sources.compactMap {
+            IOPSGetPowerSourceDescription(snapshot, $0)?.takeUnretainedValue() as? [String: Any]
+        }
+        return status(fromPowerSources: descriptions)
+    }
+
+    nonisolated static func status(fromPowerSources descriptions: [[String: Any]]) -> BatteryStatus {
+        guard
+            let battery = descriptions.first(where: {
+                $0[kIOPSTypeKey] as? String == kIOPSInternalBatteryType
+            })
+        else {
             return BatteryStatus(state: .noBattery, percentage: 0)
         }
 
-        let fields = batteryLine.split(separator: ";").map { $0.trimmingCharacters(in: .whitespaces) }
-        let percentage = firstCapture(of: #"(\d+)%"#, in: fields[0]).flatMap { Int($0) } ?? 0
-        guard fields.count >= 3 else {
-            return BatteryStatus(state: .unknown, percentage: percentage)
-        }
+        let capacity = battery[kIOPSCurrentCapacityKey] as? Int ?? 0
+        let maxCapacity = battery[kIOPSMaxCapacityKey] as? Int ?? 100
+        let percentage = maxCapacity > 0 ? capacity * 100 / maxCapacity : 0
 
         let state: BatteryStatus.State =
-            switch fields[1] {
-            case "charged":
+            switch battery[kIOPSPowerSourceStateKey] as? String {
+            case kIOPSBatteryPowerValue:
+                .discharging(remaining: timeString(fromMinutes: battery[kIOPSTimeToEmptyKey]))
+            case kIOPSACPowerValue where battery[kIOPSIsChargedKey] as? Bool == true:
                 .charged
-            case "AC attached":
+            case kIOPSACPowerValue where battery[kIOPSIsChargingKey] as? Bool == true:
+                .charging(remaining: timeString(fromMinutes: battery[kIOPSTimeToFullChargeKey]))
+            case kIOPSACPowerValue:
                 .pluggedInNotCharging
-            case "charging", "finishing charge":
-                .charging(remaining: timeString(from: fields[2]))
-            case "discharging":
-                .discharging(remaining: timeString(from: fields[2]))
             default:
                 .unknown
             }
         return BatteryStatus(state: state, percentage: percentage)
     }
 
-    private static func timeString(from estimate: String) -> String {
-        if estimate.hasPrefix("(no estimate)") {
+    nonisolated private static func timeString(fromMinutes value: Any?) -> String {
+        guard let minutes = value as? Int, minutes >= 0 else {
             return "..."
         }
-        return firstCapture(of: #"^(\d+:\d+) (remaining|until full)"#, in: estimate) ?? "—"
-    }
-
-    private static func firstCapture(of pattern: String, in text: String) -> String? {
-        guard let regex = try? NSRegularExpression(pattern: pattern),
-            let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
-            let range = Range(match.range(at: 1), in: text)
-        else {
-            return nil
-        }
-        return String(text[range])
+        return String(format: "%d:%02d", minutes / 60, minutes % 60)
     }
 }
