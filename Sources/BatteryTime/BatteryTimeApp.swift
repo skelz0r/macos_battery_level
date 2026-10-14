@@ -30,6 +30,7 @@ final class BatteryPanelModel {
     }
     private(set) var powerFlow: PowerFlow?
     private(set) var energyUse = EnergyUse.notMeasured
+    private(set) var batteryHealth: BatteryHealth?
     private(set) var chargeHistory = ChargeHistory.load()
     @ObservationIgnored private var batteryMonitor: BatteryMonitor?
     @ObservationIgnored private var chargeHistoryTimer: Timer?
@@ -56,6 +57,7 @@ final class BatteryPanelModel {
 
     func panelDidOpen() {
         updateBatteryStatus()
+        batteryHealth = BatteryHealth.read()
         energyUse = .measuring
         energyMeasurement?.cancel()
         energyMeasurement = Task { [weak self] in

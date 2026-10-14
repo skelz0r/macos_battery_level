@@ -7,7 +7,7 @@ struct BatteryPanel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             if model.batteryStatus.hasBattery {
-                BatteryHeader(status: model.batteryStatus, powerFlow: model.powerFlow)
+                BatteryHeader(status: model.batteryStatus, powerFlow: model.powerFlow, health: model.batteryHealth)
                 ChargeHistoryChart(history: model.chargeHistory)
                     .padding(.horizontal, 14)
                     .padding(.bottom, 8)
@@ -115,6 +115,7 @@ private func openActivityMonitor() {
 private struct BatteryHeader: View {
     let status: BatteryStatus
     let powerFlow: PowerFlow?
+    let health: BatteryHealth?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -137,10 +138,27 @@ private struct BatteryHeader: View {
                     .font(.system(size: 11).monospacedDigit())
                     .foregroundStyle(.secondary)
             }
+            if let health {
+                HealthLine(health: health)
+            }
         }
         .padding(.horizontal, 14)
         .padding(.top, 4)
         .padding(.bottom, 12)
+    }
+}
+
+private struct HealthLine: View {
+    let health: BatteryHealth
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Text("\(health.cycleCount) cycles · \(health.maximumCapacity) % max capacity ·")
+            Text(health.needsService ? "Service" : "Normal")
+                .foregroundStyle(health.needsService ? AnyShapeStyle(.orange) : AnyShapeStyle(.secondary))
+        }
+        .font(.system(size: 11).monospacedDigit())
+        .foregroundStyle(.secondary)
     }
 }
 
