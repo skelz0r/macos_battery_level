@@ -25,16 +25,21 @@ final class BatteryPanelModel {
         case measured([EnergyHog])
     }
 
-    private(set) var batteryStatus: BatteryStatus
+    private(set) var batteryStatus: BatteryStatus {
+        didSet { thresholdNotifier.batteryStatusDidChange(batteryStatus) }
+    }
     private(set) var powerFlow: PowerFlow?
     private(set) var energyUse = EnergyUse.notMeasured
     private(set) var chargeHistory = ChargeHistory.load()
     @ObservationIgnored private var batteryMonitor: BatteryMonitor?
     @ObservationIgnored private var chargeHistoryTimer: Timer?
+    private let thresholdNotifier: BatteryThresholdNotifier
     private var energyMeasurement: Task<Void, Never>?
 
     init() {
-        batteryStatus = BatteryStatus(state: .unknown, percentage: 0)
+        let initialStatus = BatteryStatus(state: .unknown, percentage: 0)
+        batteryStatus = initialStatus
+        thresholdNotifier = BatteryThresholdNotifier(initialStatus: initialStatus)
         batteryMonitor = BatteryMonitor { [weak self] in
             self?.updateBatteryStatus()
         }
