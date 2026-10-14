@@ -41,6 +41,13 @@ The charge history is sampled while the app runs, every five minutes or
 on any change, and kept across restarts. The curve is cut wherever the
 app was not running or the Mac was asleep for a while.
 
+## Notifications
+
+On battery, a notification when the charge drops to 20 % then to 10 %.
+While plugged in, one when it reaches 80 % then 100 %. Each threshold
+notifies once, then again only after the charge has gone back past it
+the other way. macOS asks for permission on first launch.
+
 ## Install
 
 ```bash
