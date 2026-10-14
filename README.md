@@ -18,7 +18,14 @@ Minimal macOS menu bar app displaying battery time remaining.
 ## Menu
 
 - Battery percentage
+- Processes using significant energy, if any
 - Battery Settings shortcut
+
+Energy use is measured with `top` when the menu opens, never in the
+background: it takes a few seconds and the menu shows "Measuring energy
+use..." meanwhile. Up to five apps or processes with an energy impact
+of 20 or more are listed, the same figure as Activity Monitor's Energy
+Impact column; clicking one opens Activity Monitor.
 
 ## Install
 
