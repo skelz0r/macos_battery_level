@@ -29,6 +29,11 @@ struct MenuBarTitleTests {
         #expect(try title(forFixture: "charged") == "⚡")
     }
 
+    @Test("Plugged in but not charging shows a bolt only")
+    func pluggedInNotCharging() throws {
+        #expect(try title(forFixture: "ac_attached_not_charging") == "⚡")
+    }
+
     @Test("A Mac without battery says so, without battery icon")
     func desktopWithoutBattery() throws {
         #expect(try title(forFixture: "desktop_no_battery") == "No battery")

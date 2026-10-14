@@ -4,6 +4,7 @@ struct BatteryStatus {
     enum State {
         case discharging(remaining: String)
         case charging(remaining: String)
+        case pluggedInNotCharging
         case charged
         case noBattery
         case unknown
@@ -18,7 +19,7 @@ struct BatteryStatus {
             "🔋\(remaining)"
         case .charging(let remaining):
             "⚡\(remaining)"
-        case .charged:
+        case .pluggedInNotCharging, .charged:
             "⚡"
         case .noBattery:
             "No battery"
@@ -67,6 +68,8 @@ final class BatteryMonitor {
             switch fields[1] {
             case "charged":
                 .charged
+            case "AC attached":
+                .pluggedInNotCharging
             case "charging", "finishing charge":
                 .charging(remaining: timeString(from: fields[2]))
             case "discharging":

@@ -11,7 +11,9 @@ Minimal macOS menu bar app displaying battery time remaining.
 | On battery | `🔋3:45` |
 | Charging | `⚡1:20` |
 | Fully charged | `⚡` |
-| Calculating | `...` |
+| Plugged in, not charging | `⚡` |
+| Calculating | `🔋...` or `⚡...` |
+| No battery | `No battery` |
 
 ## Menu
 
