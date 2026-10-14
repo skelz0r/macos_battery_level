@@ -1,5 +1,6 @@
 import Cocoa
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private lazy var statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
     private var timer: Timer?
@@ -53,7 +54,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func startTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 10, repeats: true) { [weak self] _ in
-            self?.updateBatteryStatus()
+            MainActor.assumeIsolated {
+                self?.updateBatteryStatus()
+            }
         }
     }
 

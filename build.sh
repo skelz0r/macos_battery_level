@@ -14,6 +14,8 @@ cp Info.plist "$APP_NAME.app/Contents/"
 
 swiftc -o "$APP_NAME.app/Contents/MacOS/$APP_NAME" \
     -framework Cocoa \
+    -swift-version 6 \
+    -warnings-as-errors \
     main.swift \
     AppDelegate.swift \
     BatteryMonitor.swift
