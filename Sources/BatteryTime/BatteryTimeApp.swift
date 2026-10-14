@@ -28,7 +28,9 @@ final class BatteryPanelModel {
     private(set) var batteryStatus: BatteryStatus
     private(set) var powerFlow: PowerFlow?
     private(set) var energyUse = EnergyUse.notMeasured
+    private(set) var chargeHistory = ChargeHistory.load()
     @ObservationIgnored private var batteryMonitor: BatteryMonitor?
+    @ObservationIgnored private var chargeHistoryTimer: Timer?
     private var energyMeasurement: Task<Void, Never>?
 
     init() {
@@ -37,6 +39,14 @@ final class BatteryPanelModel {
             self?.updateBatteryStatus()
         }
         updateBatteryStatus()
+        chargeHistoryTimer = Timer.scheduledTimer(
+            withTimeInterval: ChargeHistory.samplingInterval,
+            repeats: true
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.updateBatteryStatus()
+            }
+        }
     }
 
     func panelDidOpen() {
@@ -59,5 +69,12 @@ final class BatteryPanelModel {
     private func updateBatteryStatus() {
         batteryStatus = BatteryMonitor.currentStatus()
         powerFlow = PowerMonitor.currentFlow()
+        recordChargeHistory()
+    }
+
+    private func recordChargeHistory() {
+        if chargeHistory.record(batteryStatus, at: .now) {
+            chargeHistory.save()
+        }
     }
 }
