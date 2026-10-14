@@ -8,19 +8,20 @@ Requires macOS 26 (Liquid Glass).
 
 ## Display
 
-| State | Display |
-|-------|---------|
-| On battery | `🔋3:45` |
-| Charging | `⚡1:20` |
-| Fully charged | `⚡` |
-| Plugged in, not charging | `⚡` |
-| Calculating | `🔋...` or `⚡...` |
-| No battery | `No battery` |
+| State | Time | % | Both |
+|-------|------|---|------|
+| On battery | `🔋3:45` | `🔋85%` | `🔋3:45 85%` |
+| Charging | `⚡1:20` | `⚡60%` | `⚡1:20 60%` |
+| Fully charged | `⚡` | `⚡100%` | `⚡100%` |
+| Plugged in, not charging | `⚡` | `⚡80%` | `⚡80%` |
+| Calculating | `🔋...` or `⚡...` | `🔋85%` or `⚡60%` | `🔋... 85%` or `⚡... 60%` |
+| No battery | `No battery` | `No battery` | `No battery` |
 
 ## Panel
 
 - Battery percentage, charge bar and time remaining
 - Processes using significant energy, with their app icon
+- Menu bar title setting: time remaining (default), percentage or both
 - Battery Settings shortcut
 - Quit (⌘Q)
 

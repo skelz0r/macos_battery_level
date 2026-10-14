@@ -42,6 +42,6 @@ struct MenuBarTitleTests {
     private func title(forFixture name: String) throws -> String {
         let url = try #require(Bundle.module.url(forResource: name, withExtension: "txt", subdirectory: "Fixtures"))
         let output = try String(contentsOf: url, encoding: .utf8)
-        return BatteryMonitor.parse(output).menuBarTitle
+        return BatteryMonitor.parse(output).menuBarTitle(showing: .time)
     }
 }
