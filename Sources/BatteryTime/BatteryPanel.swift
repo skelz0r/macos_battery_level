@@ -7,7 +7,7 @@ struct BatteryPanel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             if model.batteryStatus.hasBattery {
-                BatteryHeader(status: model.batteryStatus)
+                BatteryHeader(status: model.batteryStatus, powerFlow: model.powerFlow)
                 PanelDivider()
             }
             EnergySection(energyUse: model.energyUse)
@@ -111,6 +111,7 @@ private func openActivityMonitor() {
 
 private struct BatteryHeader: View {
     let status: BatteryStatus
+    let powerFlow: PowerFlow?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -128,6 +129,11 @@ private struct BatteryHeader: View {
                 }
             }
             ChargeBar(fraction: Double(status.percentage) / 100, color: status.chargeColor)
+            if let powerFlow {
+                Text(powerFlow.panelLine)
+                    .font(.system(size: 11).monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
         }
         .padding(.horizontal, 14)
         .padding(.top, 4)
