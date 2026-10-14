@@ -1,19 +1,30 @@
 import Foundation
 
 struct BatteryStatus {
-    let timeString: String
-    let isCharging: Bool
-    let isFullyCharged: Bool
+    enum State {
+        case discharging(remaining: String)
+        case charging(remaining: String)
+        case charged
+        case noBattery
+        case unknown
+    }
+
+    let state: State
     let percentage: Int
 
     var menuBarTitle: String {
-        if isFullyCharged {
-            return "⚡"
+        switch state {
+        case .discharging(let remaining):
+            "🔋\(remaining)"
+        case .charging(let remaining):
+            "⚡\(remaining)"
+        case .charged:
+            "⚡"
+        case .noBattery:
+            "No battery"
+        case .unknown:
+            "—"
         }
-        if isCharging {
-            return "⚡\(timeString)"
-        }
-        return "🔋\(timeString)"
     }
 }
 
@@ -42,41 +53,44 @@ final class BatteryMonitor {
     }
 
     static func parse(_ output: String) -> BatteryStatus {
-        let isCharging = output.contains("AC Power") || (output.contains("charging") && !output.contains("discharging"))
-        let isFullyCharged = output.contains("charged") && !output.contains("discharging")
-
-        var percentage = 0
-        let percentPattern = #"(\d+)%"#
-        if let regex = try? NSRegularExpression(pattern: percentPattern),
-            let match = regex.firstMatch(in: output, range: NSRange(output.startIndex..., in: output)),
-            let range = Range(match.range(at: 1), in: output)
-        {
-            percentage = Int(output[range]) ?? 0
+        guard let batteryLine = output.split(separator: "\n").first(where: { $0.contains("InternalBattery") }) else {
+            return BatteryStatus(state: .noBattery, percentage: 0)
         }
 
-        if isFullyCharged {
-            return BatteryStatus(timeString: "", isCharging: true, isFullyCharged: true, percentage: percentage)
+        let fields = batteryLine.split(separator: ";").map { $0.trimmingCharacters(in: .whitespaces) }
+        let percentage = firstCapture(of: #"(\d+)%"#, in: fields[0]).flatMap { Int($0) } ?? 0
+        guard fields.count >= 3 else {
+            return BatteryStatus(state: .unknown, percentage: percentage)
         }
 
-        let pattern = #"(\d+:\d+) (remaining|until full)"#
-        if let regex = try? NSRegularExpression(pattern: pattern),
-            let match = regex.firstMatch(in: output, range: NSRange(output.startIndex..., in: output)),
-            let range = Range(match.range(at: 1), in: output)
-        {
-            return BatteryStatus(
-                timeString: String(output[range]), isCharging: isCharging, isFullyCharged: false, percentage: percentage
-            )
-        }
+        let state: BatteryStatus.State =
+            switch fields[1] {
+            case "charged":
+                .charged
+            case "charging", "finishing charge":
+                .charging(remaining: timeString(from: fields[2]))
+            case "discharging":
+                .discharging(remaining: timeString(from: fields[2]))
+            default:
+                .unknown
+            }
+        return BatteryStatus(state: state, percentage: percentage)
+    }
 
-        if output.contains("(no estimate)") || output.contains("calculating") {
-            return BatteryStatus(
-                timeString: "...", isCharging: isCharging, isFullyCharged: false, percentage: percentage)
+    private static func timeString(from estimate: String) -> String {
+        if estimate.hasPrefix("(no estimate)") {
+            return "..."
         }
+        return firstCapture(of: #"^(\d+:\d+) (remaining|until full)"#, in: estimate) ?? "—"
+    }
 
-        if !output.contains("InternalBattery") {
-            return BatteryStatus(timeString: "No battery", isCharging: false, isFullyCharged: false, percentage: 0)
+    private static func firstCapture(of pattern: String, in text: String) -> String? {
+        guard let regex = try? NSRegularExpression(pattern: pattern),
+            let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)),
+            let range = Range(match.range(at: 1), in: text)
+        else {
+            return nil
         }
-
-        return BatteryStatus(timeString: "—", isCharging: isCharging, isFullyCharged: false, percentage: percentage)
+        return String(text[range])
     }
 }

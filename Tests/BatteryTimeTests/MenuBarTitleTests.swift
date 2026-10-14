@@ -29,6 +29,11 @@ struct MenuBarTitleTests {
         #expect(try title(forFixture: "charged") == "⚡")
     }
 
+    @Test("A Mac without battery says so, without battery icon")
+    func desktopWithoutBattery() throws {
+        #expect(try title(forFixture: "desktop_no_battery") == "No battery")
+    }
+
     private func title(forFixture name: String) throws -> String {
         let url = try #require(Bundle.module.url(forResource: name, withExtension: "txt", subdirectory: "Fixtures"))
         let output = try String(contentsOf: url, encoding: .utf8)
