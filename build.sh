@@ -14,4 +14,6 @@ mkdir -p "$APP_NAME.app/Contents/Resources"
 cp Info.plist "$APP_NAME.app/Contents/"
 cp "$BIN_DIR/$APP_NAME" "$APP_NAME.app/Contents/MacOS/$APP_NAME"
 
+codesign --force --sign - "$APP_NAME.app"
+
 echo "Built $APP_NAME.app"
