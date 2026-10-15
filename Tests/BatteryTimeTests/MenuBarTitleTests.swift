@@ -14,27 +14,38 @@ struct MenuBarTitleTests {
         #expect(title(of: battery(on: kIOPSBatteryPowerValue, [kIOPSTimeToEmptyKey: -1])) == "...")
     }
 
-    @Test("Charging shows a bolt and the time until full")
+    @Test("Charging shows the time until full")
     func charging() {
         let charging = battery(on: kIOPSACPowerValue, [kIOPSIsChargingKey: true, kIOPSTimeToFullChargeKey: 83])
-        #expect(title(of: charging) == "⚡1:23")
+        #expect(title(of: charging) == "1:23")
     }
 
-    @Test("Charging while macOS is still estimating shows a bolt and dots")
+    @Test("Charging while macOS is still estimating shows dots")
     func chargingWithoutEstimate() {
         let charging = battery(on: kIOPSACPowerValue, [kIOPSIsChargingKey: true, kIOPSTimeToFullChargeKey: -1])
-        #expect(title(of: charging) == "⚡...")
+        #expect(title(of: charging) == "...")
     }
 
-    @Test("Fully charged shows a bolt only")
+    @Test("Fully charged shows no text")
     func charged() {
         let charged = battery(on: kIOPSACPowerValue, [kIOPSIsChargedKey: true, kIOPSIsChargingKey: false])
-        #expect(title(of: charged) == "⚡")
+        #expect(title(of: charged).isEmpty)
     }
 
-    @Test("Plugged in but not charging shows a bolt only")
+    @Test("Plugged in but not charging shows no text")
     func pluggedInNotCharging() {
-        #expect(title(of: battery(on: kIOPSACPowerValue, [kIOPSIsChargingKey: false])) == "⚡")
+        #expect(title(of: battery(on: kIOPSACPowerValue, [kIOPSIsChargingKey: false])).isEmpty)
+    }
+
+    @Test("Plugged in, charging or not, shows a battery with a bolt")
+    func pluggedInSymbol() {
+        let pluggedIn = [
+            battery(on: kIOPSACPowerValue, [kIOPSIsChargingKey: true, kIOPSTimeToFullChargeKey: 83]),
+            battery(on: kIOPSACPowerValue, [kIOPSIsChargedKey: true, kIOPSIsChargingKey: false]),
+            battery(on: kIOPSACPowerValue, [kIOPSIsChargingKey: false]),
+        ]
+        let symbols = pluggedIn.map { BatteryMonitor.status(fromPowerSources: [$0]).menuBarBatterySymbol }
+        #expect(symbols == Array(repeating: "battery.100percent.bolt", count: 3))
     }
 
     @Test("A Mac without battery says so, without battery icon")

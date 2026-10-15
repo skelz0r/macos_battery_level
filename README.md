@@ -11,13 +11,15 @@ Requires macOS 26 (Liquid Glass).
 | State | Display |
 |-------|---------|
 | On battery | battery icon then `3:45` |
-| Charging | `⚡1:20` |
-| Fully charged | `⚡` |
-| Plugged in, not charging | `⚡` |
-| Calculating | battery icon then `...`, or `⚡...` |
+| Charging | charging battery icon then `1:20` |
+| Fully charged | charging battery icon |
+| Plugged in, not charging | charging battery icon |
+| Calculating | battery icon or charging battery icon, then `...` |
 | No battery | `No battery` |
 
-On battery, the battery icon shows the charge level.
+On battery, the battery icon shows the charge level. Plugged in, the
+charging battery icon stays full: SF Symbols has no battery with a bolt
+for lower levels.
 
 On battery, the title turns orange at 20 % or less and red at 10 % or
 less, the same thresholds as the charge bar of the panel.
