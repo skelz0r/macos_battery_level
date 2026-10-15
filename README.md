@@ -1,12 +1,46 @@
-# BatteryTime
+<p align="center">
+  <img src="docs/logo.svg" width="112" alt="BatteryTime logo">
+</p>
 
-Minimal macOS menu bar app displaying battery time remaining.
+<h1 align="center">BatteryTime</h1>
 
-Requires macOS 26 (Liquid Glass).
+<p align="center">
+  <b>The battery time remaining, back in the macOS menu bar.</b><br>
+  A minimal menu bar app with a Liquid Glass panel for charge, power
+  draw, history, health and energy hogs.
+</p>
 
-![On battery](screenshots/on-battery.png) ![Low battery](screenshots/low-battery.png) ![Charging](screenshots/charging.png) ![Calculating](screenshots/calculating.png)
+<p align="center">
+  <img src="screenshots/on-battery.png" height="33" alt="On battery: battery icon and time remaining">
+  &nbsp;
+  <img src="screenshots/low-battery.png" height="33" alt="Low battery: time remaining in red">
+  &nbsp;
+  <img src="screenshots/charging.png" height="33" alt="Charging: charging battery icon and time to full">
+  &nbsp;
+  <img src="screenshots/calculating.png" height="33" alt="Calculating the time remaining">
+</p>
 
-## Display
+macOS no longer shows how long the battery will last. BatteryTime puts
+it next to the battery icon, colors it when the charge runs low, and
+opens a panel with everything worth knowing about the battery: what
+draws power, how the charge evolved over the day, and how worn the
+battery is.
+
+## Highlights
+
+- **Time at a glance.** Time remaining on battery, time to full while
+  charging, right in the menu bar.
+- **Warns before it's too late.** The title turns orange at 20 %, red at
+  10 %, and a notification follows.
+- **Finds what drains it.** The apps with a significant energy impact,
+  with their icon; Option-click to quit one.
+- **The last 24 hours.** A charge curve with plugged-in periods shaded.
+- **Battery health.** Cycle count, maximum capacity and condition, as in
+  System Settings.
+- **Quiet.** Follows power source events instead of polling; energy use
+  is only measured while the panel is open.
+
+## Menu bar
 
 | State | Display |
 |-------|---------|
@@ -35,6 +69,8 @@ less, the same thresholds as the charge bar of the panel.
 - Battery Settings shortcut
 - Quit (⌘Q)
 
+### Energy use
+
 Energy use is measured with `top` when the panel opens, never in the
 background: it takes a few seconds and the panel shows "Measuring energy
 use..." meanwhile. Up to five apps or processes with an energy impact
@@ -44,9 +80,13 @@ turns the impact of each app into "Quit": an Option-click asks the app
 to quit, as ⌘Q would. Processes that are not apps keep opening Activity
 Monitor.
 
+### Charge history
+
 The charge history is sampled while the app runs, every five minutes or
 on any change, and kept across restarts. The curve is cut wherever the
 app was not running or the Mac was asleep for a while.
+
+### Battery health
 
 Maximum capacity is the full charge capacity against the design
 capacity, as in System Settings. The condition turns to "Service" when
@@ -60,48 +100,39 @@ While plugged in, one when it reaches 80 % then 100 %. Each threshold
 notifies once, then again only after the charge has gone back past it
 the other way. macOS asks for permission on first launch.
 
+## Requirements
+
+- A Mac with a battery on macOS 26 (the panel uses Liquid Glass)
+- The Swift toolchain (Xcode or Command Line Tools) to build it
+
 ## Install
 
-```bash
-./install.sh
+```sh
+./install.sh         # builds, copies to /Applications, starts at login
 ```
 
-Builds, copies to `/Applications`, and starts at login.
+To update, pull and install again: the running app is replaced and
+restarted.
 
-## Update
-
-```bash
+```sh
 git pull
 ./install.sh
 ```
 
-Replaces the installed app and restarts it.
+To remove it:
 
-## Uninstall
-
-```bash
+```sh
 ./uninstall.sh
 ```
 
-## Build only
+## Development
 
-```bash
-./build.sh
-open BatteryTime.app
+```sh
+./build.sh && open BatteryTime.app   # build and run without installing
+swift test                           # run the tests
+bin/lint                             # swift format and swiftlint, strict
+bin/lint --fix                       # apply automatic corrections first
 ```
 
-## Test
-
-```bash
-swift test
-```
-
-## Lint
-
-```bash
-bin/lint
-```
-
-Runs `swift format` (shipped with the Swift toolchain) and `swiftlint`
-(`brew install swiftlint`) in strict mode. `bin/lint --fix` applies
-automatic corrections first.
+`bin/lint` needs `swiftlint` (`brew install swiftlint`); `swift format`
+ships with the Swift toolchain.
