@@ -6,10 +6,14 @@ struct MenuBarLabel: View {
 
     var body: some View {
         if let symbol = status.menuBarBatterySymbol {
-            Image(nsImage: render(Text("\(Image(systemName: symbol)) \(status.menuBarTitle)")))
+            Image(nsImage: render(Text("\(Image(systemName: symbol))\(spacedTitle)")))
         } else {
             Text(status.menuBarTitle)
         }
+    }
+
+    private var spacedTitle: String {
+        status.menuBarTitle.isEmpty ? "" : " \(status.menuBarTitle)"
     }
 
     private func render(_ title: Text) -> NSImage {
