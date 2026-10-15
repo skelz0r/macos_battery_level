@@ -5,7 +5,7 @@
     <key>CFBundleName</key>
     <string>BatteryTime</string>
     <key>CFBundleIdentifier</key>
-    <string>com.local.BatteryTime</string>
+    <string>com.skelz0r.BatteryTime</string>
     <key>CFBundleVersion</key>
     <string>1.0</string>
     <key>CFBundleShortVersionString</key>
