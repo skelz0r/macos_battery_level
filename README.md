@@ -70,6 +70,7 @@ less, the same thresholds as the charge bar of the panel.
 - Charge level over the last 24 hours, plugged-in periods shaded green
 - Battery health: cycle count, maximum capacity and condition
 - Processes using significant energy, with their app icon
+- Open at Login, off until chosen
 - Battery Settings shortcut
 - Quit (⌘Q)
 
@@ -107,12 +108,22 @@ the other way. macOS asks for permission on first launch.
 ## Requirements
 
 - A Mac with a battery on macOS 26 (the panel uses Liquid Glass)
-- The Swift toolchain (Xcode or Command Line Tools) to build it
+- To build it from source, the Swift toolchain (Xcode or Command Line
+  Tools)
 
 ## Install
 
+Download `BatteryTime-<version>.dmg` from the
+[latest release](https://github.com/skelz0r/macos_battery_level/releases/latest),
+open it and drag BatteryTime to Applications. The app is signed and
+notarized, so it opens without a Gatekeeper warning.
+
+To start it at login, choose Open at Login in the panel.
+
+### From source
+
 ```sh
-./install.sh         # builds, copies to /Applications, starts at login
+./install.sh         # builds, copies to /Applications and opens it
 ```
 
 To update, pull and install again: the running app is replaced and
@@ -129,6 +140,9 @@ To remove it:
 ./uninstall.sh
 ```
 
+Both remove the LaunchAgent that earlier versions of `install.sh` used
+to start the app at login.
+
 ## Development
 
 ```sh
@@ -140,3 +154,28 @@ bin/lint --fix                       # apply automatic corrections first
 
 `bin/lint` needs `swiftlint` (`brew install swiftlint`); `swift format`
 ships with the Swift toolchain.
+
+`build.sh` signs ad hoc with version 0.0.0; `VERSION` and
+`SIGN_IDENTITY` override them, the latter adding the hardened runtime
+and a secure timestamp.
+
+## Release
+
+```sh
+bin/release 1.2.0             # build, sign, notarize, publish v1.2.0
+bin/release --dry-run 1.2.0   # stop after the signed disk image
+```
+
+`bin/release` builds the app with the given version, signs it with the
+Developer ID Application certificate of the keychain, puts it in
+`dist/BatteryTime-<version>.dmg` next to a link to Applications, then
+notarizes and staples the image, tags `v<version>` and creates the
+GitHub release with the image attached.
+
+It needs:
+
+- a Developer ID Application certificate in the keychain
+  (`DEVELOPER_ID` picks another identity)
+- an App Store Connect API key: `ASC_KEY_ID`, `ASC_KEY_ISSUER_ID` and
+  `ASC_KEY_PATH` (the `.p8` file)
+- `gh`, logged in
