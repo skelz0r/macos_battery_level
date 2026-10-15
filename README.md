@@ -11,13 +11,17 @@
 </p>
 
 <p align="center">
-  <img src="screenshots/on-battery.png" height="33" alt="On battery: battery icon and time remaining">
+  <img src="screenshots/panel.png" width="336" alt="The panel: charge, charger, health, 24-hour history and energy hogs">
+</p>
+
+<p align="center">
+  <img src="screenshots/on-battery.png" width="102" alt="On battery: battery icon and time remaining">
   &nbsp;
-  <img src="screenshots/low-battery.png" height="33" alt="Low battery: time remaining in red">
+  <img src="screenshots/low-battery.png" width="102" alt="Low battery: time remaining in orange">
   &nbsp;
-  <img src="screenshots/charging.png" height="33" alt="Charging: charging battery icon and time to full">
+  <img src="screenshots/charging.png" width="100" alt="Charging: charging battery icon and time to full">
   &nbsp;
-  <img src="screenshots/calculating.png" height="33" alt="Calculating the time remaining">
+  <img src="screenshots/calculating.png" width="85" alt="Calculating the time remaining">
 </p>
 
 macOS no longer shows how long the battery will last. BatteryTime puts
