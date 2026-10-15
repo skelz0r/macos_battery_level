@@ -15,6 +15,14 @@ struct BatteryPanel: View {
             }
             EnergySection(energyUse: model.energyUse)
             PanelDivider()
+            PanelRow(action: model.toggleOpensAtLogin) {
+                Text("Open at Login")
+                Spacer()
+                if model.opensAtLogin {
+                    Image(systemName: "checkmark")
+                        .font(.system(size: 11, weight: .semibold))
+                }
+            }
             PanelRow(action: openBatterySettings) {
                 Text("Battery Settings...")
             }

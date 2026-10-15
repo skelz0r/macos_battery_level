@@ -1,4 +1,5 @@
 import AppKit
+import ServiceManagement
 import SwiftUI
 
 @main
@@ -31,6 +32,7 @@ final class BatteryPanelModel {
     private(set) var energyUse = EnergyUse.notMeasured
     private(set) var batteryHealth: BatteryHealth?
     private(set) var chargeHistory = ChargeHistory.load()
+    private(set) var opensAtLogin = SMAppService.mainApp.status == .enabled
     @ObservationIgnored private var batteryMonitor: BatteryMonitor?
     @ObservationIgnored private var chargeHistoryTimer: Timer?
     private let thresholdNotifier: BatteryThresholdNotifier
@@ -56,6 +58,7 @@ final class BatteryPanelModel {
 
     func panelDidOpen() {
         updateBatteryStatus()
+        opensAtLogin = SMAppService.mainApp.status == .enabled
         batteryHealth = BatteryHealth.read()
         energyUse = .measuring
         energyMeasurement?.cancel()
@@ -70,6 +73,19 @@ final class BatteryPanelModel {
         energyMeasurement?.cancel()
         energyMeasurement = nil
         energyUse = .notMeasured
+    }
+
+    func toggleOpensAtLogin() {
+        let loginItem = SMAppService.mainApp
+        if opensAtLogin {
+            try? loginItem.unregister()
+        } else {
+            try? loginItem.register()
+        }
+        if loginItem.status == .requiresApproval {
+            SMAppService.openSystemSettingsLoginItems()
+        }
+        opensAtLogin = loginItem.status == .enabled
     }
 
     private func updateBatteryStatus() {
