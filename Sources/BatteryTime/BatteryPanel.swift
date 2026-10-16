@@ -7,7 +7,12 @@ struct BatteryPanel: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             if model.batteryStatus.hasBattery {
-                BatteryHeader(status: model.batteryStatus, powerFlow: model.powerFlow, health: model.batteryHealth)
+                BatteryHeader(
+                    status: model.batteryStatus,
+                    powerFlow: model.powerFlow,
+                    powerSwitchDate: model.powerSwitch.switchDate,
+                    health: model.batteryHealth
+                )
                 ChargeHistoryChart(history: model.chargeHistory)
                     .padding(.horizontal, 14)
                     .padding(.bottom, 8)
@@ -114,6 +119,7 @@ private func openActivityMonitor() {
 private struct BatteryHeader: View {
     let status: BatteryStatus
     let powerFlow: PowerFlow?
+    let powerSwitchDate: Date?
     let health: BatteryHealth?
 
     var body: some View {
@@ -133,9 +139,11 @@ private struct BatteryHeader: View {
             }
             ChargeBar(fraction: Double(status.percentage) / 100, color: status.chargeColor)
             if let powerFlow {
-                Text(powerFlow.panelLine)
-                    .font(.system(size: 11).monospacedDigit())
-                    .foregroundStyle(.secondary)
+                TimelineView(.everyMinute) { context in
+                    Text(powerFlow.panelLine(switchedAt: powerSwitchDate, now: context.date))
+                }
+                .font(.system(size: 11).monospacedDigit())
+                .foregroundStyle(.secondary)
             }
             if let health {
                 HealthLine(health: health)

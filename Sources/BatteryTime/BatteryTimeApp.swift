@@ -28,6 +28,7 @@ final class BatteryPanelModel {
         didSet { thresholdNotifier.batteryStatusDidChange(batteryStatus) }
     }
     private(set) var powerFlow: PowerFlow?
+    private(set) var powerSwitch = PowerSwitchTracker()
     private(set) var energyUse = EnergyUse.notMeasured
     private(set) var batteryHealth: BatteryHealth?
     private(set) var chargeHistory = ChargeHistory.load()
@@ -75,6 +76,7 @@ final class BatteryPanelModel {
     private func updateBatteryStatus() {
         batteryStatus = BatteryMonitor.currentStatus()
         powerFlow = PowerMonitor.currentFlow()
+        powerSwitch.observe(PowerMonitor.currentSource(), at: .now)
         recordChargeHistory()
     }
 
