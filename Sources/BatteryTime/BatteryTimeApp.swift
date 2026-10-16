@@ -45,6 +45,7 @@ final class BatteryPanelModel {
             self?.updateBatteryStatus()
         }
         updateBatteryStatus()
+        readPowerSwitchFromLog()
         chargeHistoryTimer = Timer.scheduledTimer(
             withTimeInterval: ChargeHistory.samplingInterval,
             repeats: true
@@ -78,6 +79,14 @@ final class BatteryPanelModel {
         powerFlow = PowerMonitor.currentFlow()
         powerSwitch.observe(PowerMonitor.currentSource(), at: .now)
         recordChargeHistory()
+    }
+
+    private func readPowerSwitchFromLog() {
+        guard let source = powerSwitch.source else { return }
+        Task { [weak self] in
+            let switchDate = await PowerSwitchLog.lastSwitch(to: source)
+            self?.powerSwitch.recall(switchDate, loggedFor: source)
+        }
     }
 
     private func recordChargeHistory() {
