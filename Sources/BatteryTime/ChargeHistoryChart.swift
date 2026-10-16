@@ -8,7 +8,7 @@ struct ChargeHistoryChart: View {
         TimelineView(.periodic(from: .now, by: 60)) { context in
             chart(until: context.date)
         }
-        .frame(height: 48)
+        .frame(height: 96)
     }
 
     private func chart(until now: Date) -> some View {
