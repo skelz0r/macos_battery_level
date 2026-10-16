@@ -9,4 +9,9 @@ struct PowerSwitchTracker {
         switchDate = source != nil && newSource != nil ? date : nil
         source = newSource
     }
+
+    mutating func recall(_ loggedDate: Date?, loggedFor loggedSource: PowerSource) {
+        guard switchDate == nil, loggedSource == source else { return }
+        switchDate = loggedDate
+    }
 }
