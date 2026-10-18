@@ -32,7 +32,7 @@ struct BatteryStatus {
 
     var menuBarBatterySymbol: String? {
         switch state {
-        case .discharging:
+        case .discharging, .charging, .pluggedInNotCharging, .charged, .chargedToLimit:
             switch percentage {
             case ...12: "battery.0percent"
             case ...37: "battery.25percent"
@@ -40,11 +40,13 @@ struct BatteryStatus {
             case ...87: "battery.75percent"
             default: "battery.100percent"
             }
-        case .charging, .pluggedInNotCharging, .charged, .chargedToLimit:
-            "battery.100percent.bolt"
         case .noBattery, .unknown:
             nil
         }
+    }
+
+    var menuBarShowsBolt: Bool {
+        if case .charging = state { true } else { false }
     }
 
     func limited(to limit: Int?, gauge: BatteryGauge?) -> Self {

@@ -6,10 +6,15 @@ struct MenuBarLabel: View {
 
     var body: some View {
         if let symbol = status.menuBarBatterySymbol {
-            Image(nsImage: render(Text("\(Image(systemName: symbol))\(spacedTitle)")))
+            Image(nsImage: render(Text("\(Image(systemName: symbol))\(bolt)\(spacedTitle)")))
         } else {
             Text(status.menuBarTitle)
         }
+    }
+
+    private var bolt: Text {
+        guard status.menuBarShowsBolt else { return Text("") }
+        return Text(Image(systemName: "bolt.fill")).font(.system(size: NSFont.smallSystemFontSize))
     }
 
     private var spacedTitle: String {

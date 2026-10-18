@@ -37,15 +37,15 @@ struct MenuBarTitleTests {
         #expect(title(of: battery(on: kIOPSACPowerValue, [kIOPSIsChargingKey: false])).isEmpty)
     }
 
-    @Test("Plugged in, charging or not, shows a battery with a bolt")
+    @Test("Plugged in, the battery shows its actual level, with a bolt only while charging")
     func pluggedInSymbol() {
         let pluggedIn = [
             battery(on: kIOPSACPowerValue, [kIOPSIsChargingKey: true, kIOPSTimeToFullChargeKey: 83]),
-            battery(on: kIOPSACPowerValue, [kIOPSIsChargedKey: true, kIOPSIsChargingKey: false]),
             battery(on: kIOPSACPowerValue, [kIOPSIsChargingKey: false]),
-        ]
-        let symbols = pluggedIn.map { BatteryMonitor.status(fromPowerSources: [$0]).menuBarBatterySymbol }
-        #expect(symbols == Array(repeating: "battery.100percent.bolt", count: 3))
+        ].map { BatteryMonitor.status(fromPowerSources: [$0]) }
+
+        #expect(pluggedIn.map(\.menuBarBatterySymbol) == ["battery.50percent", "battery.50percent"])
+        #expect(pluggedIn.map(\.menuBarShowsBolt) == [true, false])
     }
 
     @Test("A Mac without battery says so, without battery icon")
