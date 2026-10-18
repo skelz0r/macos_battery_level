@@ -90,7 +90,7 @@ final class BatteryPanelModel {
         if chargeLimit.observe(status, at: .now) {
             chargeLimit.save()
         }
-        batteryStatus = status
+        batteryStatus = status.limited(to: chargeLimit.percentage, gauge: BatteryGauge.read())
         powerFlow = PowerMonitor.currentFlow()
         powerSwitch.observe(PowerMonitor.currentSource(), at: .now)
         recordChargeHistory()

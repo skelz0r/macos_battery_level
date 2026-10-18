@@ -50,18 +50,27 @@ struct ChargeLimitTests {
         #expect(limit.percentage == nil)
     }
 
-    @Test("Charging more than 3 points above the learned limit forgets it")
+    @Test("Charging more than 3 points above the learned limit forgets it and counts time until full again")
     func limitRaised() {
         var limit = ChargeLimit()
         chargeStops(at: 80, on: 0, in: &limit)
         limit.observe(charging(83), at: minutes(24 * 60))
         #expect(limit.percentage == 80)
 
-        let aboveLimit = charging(84)
-        limit.observe(aboveLimit, at: minutes(24 * 60 + 5))
+        limit.observe(charging(84), at: minutes(24 * 60 + 5))
 
         #expect(limit.percentage == nil)
+        #expect(charging(50).limited(to: limit.percentage, gauge: gauge).menuBarTitle == "1:23")
     }
+
+    @Test("Charging past the learned limit by up to 3 points still counts toward the limit, not until full")
+    func chargingJustAboveLimit() {
+        let status = charging(81).limited(to: 80, gauge: gauge)
+
+        #expect(status.panelDetail == "Calculating...")
+    }
+
+    private let gauge = BatteryGauge(fullCapacity: 4000, current: 2000)
 
     private func chargeStops(at percentage: Int, on day: Int, in limit: inout ChargeLimit) {
         let morning = day * 24 * 60

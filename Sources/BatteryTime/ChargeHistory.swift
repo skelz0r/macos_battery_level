@@ -76,7 +76,7 @@ extension BatteryStatus {
         switch state {
         case .discharging:
             ChargeSample(date: date, percentage: percentage, isPluggedIn: false)
-        case .charging, .charged, .pluggedInNotCharging:
+        case .charging, .charged, .pluggedInNotCharging, .chargedToLimit:
             ChargeSample(date: date, percentage: percentage, isPluggedIn: true)
         case .noBattery, .unknown:
             nil

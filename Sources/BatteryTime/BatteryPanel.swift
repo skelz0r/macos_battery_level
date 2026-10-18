@@ -323,16 +323,20 @@ extension BatteryStatus {
 
     var panelDetail: String? {
         switch state {
-        case .discharging("..."), .charging("..."):
+        case .discharging("..."), .charging("...", _):
             "Calculating..."
         case .discharging(let remaining):
             "\(remaining) remaining"
-        case .charging(let remaining):
+        case .charging(let remaining, 100):
             "Charging, \(remaining) until full"
+        case .charging(let remaining, let target):
+            "Charging, \(remaining) until \(target) %"
         case .pluggedInNotCharging:
             "Plugged in, not charging"
         case .charged:
             "Fully charged"
+        case .chargedToLimit(let limit):
+            "Charged to the \(limit) % limit"
         case .noBattery, .unknown:
             nil
         }
@@ -340,7 +344,7 @@ extension BatteryStatus {
 
     var chargeColor: Color {
         switch state {
-        case .charging, .charged, .pluggedInNotCharging:
+        case .charging, .charged, .pluggedInNotCharging, .chargedToLimit:
             .green
         default:
             lowLevelColor ?? (ProcessInfo.processInfo.isLowPowerModeEnabled ? .yellow : .green)
