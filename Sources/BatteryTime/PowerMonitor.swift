@@ -57,8 +57,7 @@ enum PowerMonitor {
             guard let watts = adapter[kIOPSPowerAdapterWattsKey] as? Int else { return nil }
             return .charger(watts: watts, port: chargingPort())
         }
-        let batteryService = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceNameMatching("AppleSmartBattery"))
-        guard let battery = properties(of: batteryService),
+        guard let battery = SmartBattery.properties(),
             let millivolts = battery["Voltage"] as? Int,
             let milliamps = battery["InstantAmperage"] as? Int,
             milliamps < 0
