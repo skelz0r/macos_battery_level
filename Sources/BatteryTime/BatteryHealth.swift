@@ -1,5 +1,4 @@
 import Foundation
-import IOKit
 
 struct BatteryHealth {
     static let serviceCapacityThreshold = 0.8
@@ -17,15 +16,7 @@ struct BatteryHealth {
     }
 
     static func read() -> Self? {
-        let service = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("AppleSmartBattery"))
-        guard service != IO_OBJECT_NULL else { return nil }
-        defer { IOObjectRelease(service) }
-
-        var properties: Unmanaged<CFMutableDictionary>?
-        guard IORegistryEntryCreateCFProperties(service, &properties, kCFAllocatorDefault, 0) == KERN_SUCCESS,
-            let dictionary = properties?.takeRetainedValue() as? [String: Any]
-        else { return nil }
-        return Self(properties: dictionary)
+        SmartBattery.properties().flatMap(Self.init(properties:))
     }
 
     init?(properties: [String: Any]) {

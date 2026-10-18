@@ -4,8 +4,9 @@ import IOKit.ps
 struct BatteryStatus {
     enum State {
         case discharging(remaining: String)
-        case charging(remaining: String)
+        case charging(remaining: String, target: Int = 100)
         case pluggedInNotCharging
+        case chargedToLimit(Int)
         case charged
         case noBattery
         case unknown
@@ -16,10 +17,12 @@ struct BatteryStatus {
 
     var menuBarTitle: String {
         switch state {
-        case .discharging(let remaining), .charging(let remaining):
+        case .discharging(let remaining), .charging(let remaining, _):
             remaining
         case .pluggedInNotCharging, .charged:
             ""
+        case .chargedToLimit(let limit):
+            "Limit \(limit) %"
         case .noBattery:
             "No battery"
         case .unknown:
@@ -29,7 +32,7 @@ struct BatteryStatus {
 
     var menuBarBatterySymbol: String? {
         switch state {
-        case .discharging:
+        case .discharging, .charging, .pluggedInNotCharging, .charged, .chargedToLimit:
             switch percentage {
             case ...12: "battery.0percent"
             case ...37: "battery.25percent"
@@ -37,10 +40,28 @@ struct BatteryStatus {
             case ...87: "battery.75percent"
             default: "battery.100percent"
             }
-        case .charging, .pluggedInNotCharging, .charged:
-            "battery.100percent.bolt"
         case .noBattery, .unknown:
             nil
+        }
+    }
+
+    var menuBarShowsBolt: Bool {
+        if case .charging = state { true } else { false }
+    }
+
+    func limited(to limit: Int?, gauge: BatteryGauge?) -> Self {
+        guard let limit, limit < 100 else { return self }
+        switch state {
+        case .charging where percentage <= limit + ChargeLimit.tolerance:
+            let minutes = gauge?.minutesToCharge(from: percentage, to: limit)
+            return Self(
+                state: .charging(remaining: BatteryMonitor.timeString(fromMinutes: minutes), target: limit),
+                percentage: percentage
+            )
+        case .pluggedInNotCharging where abs(percentage - limit) <= ChargeLimit.tolerance:
+            return Self(state: .chargedToLimit(limit), percentage: percentage)
+        default:
+            return self
         }
     }
 }
@@ -113,7 +134,7 @@ final class BatteryMonitor {
         return BatteryStatus(state: state, percentage: percentage)
     }
 
-    nonisolated private static func timeString(fromMinutes value: Any?) -> String {
+    nonisolated static func timeString(fromMinutes value: Any?) -> String {
         guard let minutes = value as? Int, minutes >= 0 else {
             return "..."
         }

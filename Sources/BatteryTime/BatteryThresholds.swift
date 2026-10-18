@@ -39,7 +39,7 @@ struct BatteryThresholds {
 extension BatteryStatus {
     fileprivate var reportsPercentage: Bool {
         switch state {
-        case .discharging, .charging, .pluggedInNotCharging, .charged:
+        case .discharging, .charging, .pluggedInNotCharging, .charged, .chargedToLimit:
             true
         case .noBattery, .unknown:
             false
@@ -52,7 +52,7 @@ extension BatteryStatus {
 
     fileprivate var isOnPower: Bool {
         switch state {
-        case .charging, .pluggedInNotCharging, .charged:
+        case .charging, .pluggedInNotCharging, .charged, .chargedToLimit:
             true
         case .discharging, .noBattery, .unknown:
             false

@@ -32,8 +32,10 @@ final class BatteryPanelModel {
     private(set) var energyUse = EnergyUse.notMeasured
     private(set) var batteryHealth: BatteryHealth?
     private(set) var chargeHistory = ChargeHistory.load()
+    @ObservationIgnored private var chargeLimit = ChargeLimit.load()
     @ObservationIgnored private var batteryMonitor: BatteryMonitor?
     @ObservationIgnored private var chargeHistoryTimer: Timer?
+    @ObservationIgnored private var sleepObserver: NSObjectProtocol?
     private let thresholdNotifier: BatteryThresholdNotifier
     private var energyMeasurement: Task<Void, Never>?
 
@@ -52,6 +54,15 @@ final class BatteryPanelModel {
         ) { [weak self] _ in
             MainActor.assumeIsolated {
                 self?.updateBatteryStatus()
+            }
+        }
+        sleepObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.willSleepNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.chargeLimit.systemWillSleep()
             }
         }
     }
@@ -75,7 +86,11 @@ final class BatteryPanelModel {
     }
 
     private func updateBatteryStatus() {
-        batteryStatus = BatteryMonitor.currentStatus()
+        let status = BatteryMonitor.currentStatus()
+        if chargeLimit.observe(status, at: .now) {
+            chargeLimit.save()
+        }
+        batteryStatus = status.limited(to: chargeLimit.percentage, gauge: BatteryGauge.read())
         powerFlow = PowerMonitor.currentFlow()
         powerSwitch.observe(PowerMonitor.currentSource(), at: .now)
         recordChargeHistory()
