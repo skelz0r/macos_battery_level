@@ -34,6 +34,8 @@ battery is.
 
 - **Time at a glance.** Time remaining on battery, time to full while
   charging, right in the menu bar.
+- **Follows the charge limit.** Learns the macOS Charge Limit setting
+  and counts charging time until it instead of until 100 %.
 - **Warns before it's too late.** The title turns orange at 20 %, red at
   10 %, and a notification follows.
 - **Finds what drains it.** The apps with a significant energy impact,
@@ -49,15 +51,25 @@ battery is.
 | State | Display |
 |-------|---------|
 | On battery | battery icon then `3:45` |
-| Charging | charging battery icon then `1:20` |
-| Fully charged | charging battery icon |
-| Plugged in, not charging | charging battery icon |
-| Calculating | battery icon or charging battery icon, then `...` |
+| Charging | battery icon and bolt, then `1:20` |
+| Fully charged | battery icon |
+| At the charge limit | battery icon then `Limit 80 %` |
+| Plugged in, not charging | battery icon |
+| Calculating | battery icon, bolt while charging, then `...` |
 | No battery | `No battery` |
 
-On battery, the battery icon shows the charge level. Plugged in, the
-charging battery icon stays full: SF Symbols has no battery with a bolt
-for lower levels.
+The battery icon always shows the charge level. SF Symbols has no
+battery with a bolt for each level, so a bolt follows it while
+charging.
+
+macOS does not let apps read the Charge Limit setting, so BatteryTime
+learns it: when it sees charging stop below 100 % and the charge stay
+there for 10 minutes, it keeps that percentage. The limit is the median
+of the last 7 such stops, rounded to the nearest setting (80, 85, 90,
+95 or 100 %). Charging more than 3 points above it means the setting
+changed, and BatteryTime counts until 100 % again until it sees the
+next stop. The time until the limit comes from the capacity left and
+the charging current, as charging slows down past 80 %.
 
 On battery, the title turns orange at 20 % or less and red at 10 % or
 less, the same thresholds as the charge bar of the panel.
