@@ -124,7 +124,7 @@ private struct BatteryHeader: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Battery")
+            Text(status.isLowPowerMode ? "Battery · Low Power Mode" : "Battery")
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(.secondary)
             HStack(alignment: .firstTextBaseline) {
