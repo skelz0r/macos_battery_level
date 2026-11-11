@@ -6,7 +6,7 @@ struct MenuBarLabel: View {
 
     var body: some View {
         if let symbol = status.menuBarBatterySymbol {
-            Image(nsImage: render(Text("\(Image(systemName: symbol))\(spacedTitle)")))
+            Image(nsImage: render(symbol: symbol))
         } else {
             Text(status.menuBarTitle)
         }
@@ -16,10 +16,21 @@ struct MenuBarLabel: View {
         status.menuBarTitle.isEmpty ? "" : " \(status.menuBarTitle)"
     }
 
-    private func render(_ title: Text) -> NSImage {
+    private func render(symbol: String) -> NSImage {
         let renderer = ImageRenderer(
             content:
-                title
+                HStack(alignment: .firstTextBaseline, spacing: 0) {
+                    Text(Image(systemName: symbol))
+                        .overlay(alignment: .topTrailing) {
+                            if status.isLowPowerMode {
+                                lowPowerBadge
+                            }
+                        }
+                        .padding(.trailing, status.isLowPowerMode ? 3 : 0)
+                    if !spacedTitle.isEmpty {
+                        Text(spacedTitle)
+                    }
+                }
                 .font(.system(size: NSFont.systemFontSize))
                 .foregroundStyle(status.menuBarColor ?? .black)
         )
@@ -27,6 +38,12 @@ struct MenuBarLabel: View {
         let image = renderer.nsImage ?? NSImage()
         image.isTemplate = status.menuBarColor == nil
         return image
+    }
+
+    private var lowPowerBadge: some View {
+        Image(systemName: "circle.fill")
+            .font(.system(size: 5))
+            .offset(x: 3)
     }
 }
 
