@@ -13,6 +13,7 @@ struct BatteryStatus {
 
     let state: State
     let percentage: Int
+    var isLowPowerMode = false
 
     var menuBarTitle: String {
         switch state {
@@ -81,7 +82,9 @@ final class BatteryMonitor {
         let descriptions = sources.compactMap {
             IOPSGetPowerSourceDescription(snapshot, $0)?.takeUnretainedValue() as? [String: Any]
         }
-        return status(fromPowerSources: descriptions)
+        var status = status(fromPowerSources: descriptions)
+        status.isLowPowerMode = ProcessInfo.processInfo.isLowPowerModeEnabled
+        return status
     }
 
     nonisolated static func status(fromPowerSources descriptions: [[String: Any]]) -> BatteryStatus {

@@ -34,6 +34,7 @@ final class BatteryPanelModel {
     private(set) var chargeHistory = ChargeHistory.load()
     @ObservationIgnored private var batteryMonitor: BatteryMonitor?
     @ObservationIgnored private var chargeHistoryTimer: Timer?
+    @ObservationIgnored private var lowPowerModeObserver: NSObjectProtocol?
     private let thresholdNotifier: BatteryThresholdNotifier
     private var energyMeasurement: Task<Void, Never>?
 
@@ -49,6 +50,15 @@ final class BatteryPanelModel {
         chargeHistoryTimer = Timer.scheduledTimer(
             withTimeInterval: ChargeHistory.samplingInterval,
             repeats: true
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                self?.updateBatteryStatus()
+            }
+        }
+        lowPowerModeObserver = NotificationCenter.default.addObserver(
+            forName: .NSProcessInfoPowerStateDidChange,
+            object: nil,
+            queue: .main
         ) { [weak self] _ in
             MainActor.assumeIsolated {
                 self?.updateBatteryStatus()

@@ -343,7 +343,7 @@ extension BatteryStatus {
         case .charging, .charged, .pluggedInNotCharging:
             .green
         default:
-            lowLevelColor ?? (ProcessInfo.processInfo.isLowPowerModeEnabled ? .yellow : .green)
+            lowLevelColor ?? (isLowPowerMode ? .yellow : .green)
         }
     }
 
