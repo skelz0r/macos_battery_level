@@ -26,7 +26,19 @@ struct MenuBarColorTests {
         #expect(BatteryStatus(state: .pluggedInNotCharging, percentage: 5).menuBarColor == nil)
     }
 
-    private func onBattery(percentage: Int) -> BatteryStatus {
-        BatteryStatus(state: .discharging(remaining: "0:42"), percentage: percentage)
+    @Test("In Low Power Mode the title keeps the menu bar color, a badge shows it instead")
+    func lowPowerModeAboveTwentyPercent() {
+        #expect(onBattery(percentage: 21, isLowPowerMode: true).menuBarColor == nil)
+        #expect(BatteryStatus(state: .charged, percentage: 100, isLowPowerMode: true).menuBarColor == nil)
+    }
+
+    @Test("In Low Power Mode a low battery still turns orange or red")
+    func lowPowerModeWithLowBattery() {
+        #expect(onBattery(percentage: 20, isLowPowerMode: true).menuBarColor == .orange)
+        #expect(onBattery(percentage: 10, isLowPowerMode: true).menuBarColor == .red)
+    }
+
+    private func onBattery(percentage: Int, isLowPowerMode: Bool = false) -> BatteryStatus {
+        BatteryStatus(state: .discharging(remaining: "0:42"), percentage: percentage, isLowPowerMode: isLowPowerMode)
     }
 }
